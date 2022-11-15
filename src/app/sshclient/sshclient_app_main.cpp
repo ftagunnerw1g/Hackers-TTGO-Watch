@@ -30,6 +30,8 @@
 #include "gui/widget_factory.h"
 #include "gui/widget_styles.h"
 
+#include "hardware/powermgm.h"
+
 lv_obj_t *sshclient_app_main_tile = NULL;
 lv_style_t sshclient_app_main_style;
 lv_obj_t *sshclient_ip_textfield = NULL;
@@ -527,11 +529,13 @@ static void sshclient_command_textarea_event_cb( lv_obj_t * obj, lv_event_t even
 void ssh_task(void * pvParameters)
 {
     log_i("init libssh");
+    powermgm_set_boost_mode();
     libssh_begin();
     vTaskDelay(100);
     int ex_rc = ex_main();
     vTaskDelay(100);
     ssh_finalize();
+    powermgm_set_normal_mode();
     vTaskDelay(100);
     vTaskDelete( NULL );
 }

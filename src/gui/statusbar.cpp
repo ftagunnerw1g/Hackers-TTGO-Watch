@@ -466,16 +466,16 @@ bool statusbar_displayctl_event_cb( EventBits_t event, void *arg ) {
 static void statusbar_pmuctl_update_batt( int32_t percent, bool charging, bool plug) {
     char level[8]="";
 
-    if ( percent >= 0 && percent <= 100 ) {
-        snprintf( level, sizeof( level ), "%d%%", percent );
-    }
-    else if ( percent > 100 ) {
-        snprintf( level, sizeof( level ), "!%d%%", percent );
-    }
-    else {
-        snprintf( level, sizeof( level ), "?" );
-        percent = 0;
-    }
+    //if ( percent >= 0 && percent <= 100 ) {
+    //    snprintf( level, sizeof( level ), "%d%%", percent );
+    //}
+    //else if ( percent > 100 ) {
+    //    snprintf( level, sizeof( level ), "!%d%%", percent );
+    //}
+    //else {
+    //    snprintf( level, sizeof( level ), "?" );
+    //    percent = 0;
+    //}
     lv_label_set_text( statusicon[  STATUSBAR_BATTERY_PERCENT ].icon, (const char *)level );
     if ( !plug ) {
         if ( percent >= 75 ) { 
