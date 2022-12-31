@@ -55,7 +55,7 @@ static lv_style_t quickbarstyle[ QUICKBAR_STYLE_NUM ];
 LV_IMG_DECLARE(maintile_32px);
 LV_IMG_DECLARE(setup_32px);
 LV_IMG_DECLARE(camera_32px);
-LV_FONT_DECLARE(Ubuntu_48px);
+LV_FONT_DECLARE(LCD_32px);
 
 lv_task_t * quickbar_task;
 static uint32_t quickbar_counter = 0;
@@ -78,7 +78,7 @@ void quickbar_setup( void ){
 
     /*Copy a built-in style to initialize the new style*/
     lv_style_init( &quickbarstyle[ QUICKBAR_STYLE_NORMAL ] );
-    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_NORMAL ], LV_STATE_DEFAULT, &Ubuntu_48px);
+    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_NORMAL ], LV_STATE_DEFAULT, &LCD_32px);
     lv_style_set_radius( &quickbarstyle[ QUICKBAR_STYLE_NORMAL ], LV_OBJ_PART_MAIN, 0 );
     lv_style_set_bg_color( &quickbarstyle[ QUICKBAR_STYLE_NORMAL ], LV_OBJ_PART_MAIN, LV_COLOR_WHITE );
     lv_style_set_bg_opa( &quickbarstyle[ QUICKBAR_STYLE_NORMAL ], LV_OBJ_PART_MAIN, LV_OPA_80 );
@@ -88,7 +88,7 @@ void quickbar_setup( void ){
     lv_style_set_image_recolor( &quickbarstyle[ QUICKBAR_STYLE_NORMAL ], LV_OBJ_PART_MAIN, LV_COLOR_WHITE );
 
     lv_style_init( &quickbarstyle[ QUICKBAR_STYLE_LIGHT ] );
-    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_LIGHT ], LV_STATE_DEFAULT, &Ubuntu_48px);
+    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_LIGHT ], LV_STATE_DEFAULT, &LCD_32px);
     lv_style_set_radius( &quickbarstyle[ QUICKBAR_STYLE_LIGHT ], LV_OBJ_PART_MAIN, 0 );
     lv_style_set_bg_color( &quickbarstyle[ QUICKBAR_STYLE_LIGHT ], LV_OBJ_PART_MAIN, LV_COLOR_WHITE );
     lv_style_set_bg_opa( &quickbarstyle[ QUICKBAR_STYLE_LIGHT ], LV_OBJ_PART_MAIN, LV_OPA_0 );
@@ -99,7 +99,7 @@ void quickbar_setup( void ){
     lv_style_set_image_recolor_opa( &quickbarstyle[ QUICKBAR_STYLE_DARK ], LV_IMGBTN_PART_MAIN, LV_OPA_COVER );
 
     lv_style_init( &quickbarstyle[ QUICKBAR_STYLE_DARK ] );
-    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_DARK ], LV_STATE_DEFAULT, &Ubuntu_48px);
+    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_DARK ], LV_STATE_DEFAULT, &LCD_32px);
     lv_style_set_radius( &quickbarstyle[ QUICKBAR_STYLE_DARK ], LV_OBJ_PART_MAIN, 0 );
     lv_style_set_bg_color( &quickbarstyle[ QUICKBAR_STYLE_DARK ], LV_OBJ_PART_MAIN, LV_COLOR_BLACK );
     lv_style_set_bg_opa( &quickbarstyle[ QUICKBAR_STYLE_DARK ], LV_OBJ_PART_MAIN, LV_OPA_0 );
@@ -110,7 +110,7 @@ void quickbar_setup( void ){
     lv_style_set_image_recolor_opa( &quickbarstyle[ QUICKBAR_STYLE_DARK ], LV_IMGBTN_PART_MAIN, LV_OPA_COVER );
 
     lv_style_init( &quickbarstyle[ QUICKBAR_STYLE_TRANS ] );
-    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_TRANS ], LV_STATE_DEFAULT, &Ubuntu_48px);
+    lv_style_set_text_font( &quickbarstyle[ QUICKBAR_STYLE_TRANS ], LV_STATE_DEFAULT, &LCD_32px);
     lv_style_set_radius( &quickbarstyle[ QUICKBAR_STYLE_TRANS ], LV_OBJ_PART_MAIN, 0 );
     lv_style_set_bg_color( &quickbarstyle[ QUICKBAR_STYLE_TRANS ], LV_OBJ_PART_MAIN, LV_COLOR_BLACK );
     lv_style_set_bg_opa( &quickbarstyle[ QUICKBAR_STYLE_TRANS ], LV_OBJ_PART_MAIN, LV_OPA_TRANSP );
@@ -129,7 +129,7 @@ void quickbar_setup( void ){
     lv_label_set_text( quickbar_time_label, "00:00");
     lv_obj_reset_style_list( quickbar_time_label, LV_OBJ_PART_MAIN );
     lv_obj_add_style( quickbar_time_label, LV_OBJ_PART_MAIN, &quickbarstyle[ QUICKBAR_STYLE_DARK ]  );
-    lv_obj_align( quickbar_time_label, NULL, LV_ALIGN_IN_TOP_MID, 8, 0);
+    lv_obj_align( quickbar_time_label, NULL, LV_ALIGN_CENTER, 0, 0);
 
     lv_obj_t *quickbar_maintile = lv_btn_create( quickbar, NULL );
     lv_obj_set_width( quickbar_maintile, 48 );
@@ -240,7 +240,7 @@ bool quickbar_button_event_cb( EventBits_t event, void *arg ) {
             if( lv_obj_get_hidden( quickbar ) ) {
                 timesync_get_current_timestring( time, sizeof( time ) );
                 lv_label_set_text( quickbar_time_label, time );
-                lv_obj_align( quickbar_time_label, NULL, LV_ALIGN_IN_TOP_MID, 0, 0);
+                lv_obj_align( quickbar_time_label, NULL, LV_ALIGN_CENTER, 0, 0);
                 quickbar_hide( false );
             }
             else {

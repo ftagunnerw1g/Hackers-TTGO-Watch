@@ -27,7 +27,6 @@
 #include "gui/mainbar/setup_tile/watchface/watchface_tile.h"
 #include "watchface_manager_app.h"
 
-#include "gui/mainbar/setup_tile/bluetooth_settings/bluetooth_message.h"
 #include "gui/mainbar/app_tile/app_tile.h"
 #include "gui/mainbar/main_tile/main_tile.h"
 #include "gui/mainbar/mainbar.h"

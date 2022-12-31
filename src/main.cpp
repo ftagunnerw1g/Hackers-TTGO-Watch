@@ -20,6 +20,7 @@
 #include "app/iplookup/iplookup_app.h"
 #include "app/wireless/wireless_app.h"
 #include "app/wifimon/wifimon_app.h"
+#include "app/debug/debug_app.h"
 
 #if defined( NATIVE_64BIT )
     /**
@@ -47,12 +48,6 @@ void setup() {
     /**
      * apps here
      */
-    stopwatch_app_setup();
-    alarm_clock_setup();
-#if defined ( LILYGO_WATCH_2020_V2 )
-    gps_status_setup();
-    osmmap_app_setup();
-#endif
 #if defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V3 )
     bluebox_app_setup();
 #endif 
@@ -63,6 +58,15 @@ void setup() {
     sshclient_app_setup();
     wireless_app_setup();
     wifimon_app_setup();
+    debug_app_setup();
+    stopwatch_app_setup();
+    alarm_clock_setup();
+
+#if defined ( LILYGO_WATCH_2020_V2 )
+    gps_status_setup();
+    osmmap_app_setup();
+#endif
+
     /**
      * post hardware setup
      */

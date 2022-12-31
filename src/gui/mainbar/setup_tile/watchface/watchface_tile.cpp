@@ -36,7 +36,6 @@
 #include "gui/app.h"
 #include "gui/widget.h"
 #include "gui/widget_styles.h"
-#include "gui/mainbar/setup_tile/bluetooth_settings/bluetooth_message.h"
 #include "hardware/blectl.h"
 #include "hardware/rtcctl.h"
 #include "hardware/powermgm.h"
@@ -958,9 +957,6 @@ void watchface_app_label_update( tm &info ) {
             }
             else if ( !strcmp( "battery_voltage", watchface_theme_config.dial.label[ i ].type ) ) {
                 snprintf( temp_str, sizeof( temp_str ), watchface_theme_config.dial.label[ i ].label, pmu_get_battery_voltage() / 1000 );
-            }
-            else if ( !strcmp( "bluetooth_messages", watchface_theme_config.dial.label[ i ].type ) ) {
-                snprintf( temp_str, sizeof( temp_str ), watchface_theme_config.dial.label[ i ].label, bluetooth_get_number_of_msg() );
             }
             else if ( !strcmp( "steps", watchface_theme_config.dial.label[ i ].type ) ) {
                 snprintf( temp_str, sizeof( temp_str ), watchface_theme_config.dial.label[ i ].label, bma_get_stepcounter() );

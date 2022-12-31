@@ -210,6 +210,19 @@ bool pmu_blectl_event_cb( EventBits_t event, void *arg ) {
     return( true );
 }
 
+void mark_time(void)
+{
+    time_t timer;
+    char timebuffer[26];
+    struct tm* tm_info;
+
+    timer = time(NULL);
+    tm_info = localtime(&timer);
+
+    strftime(timebuffer, 26, "%Y-%m-%d %H:%M:%S", tm_info); 
+    log_i("%s", timebuffer);
+}
+
 void pmu_loop( void ) {
     static uint64_t nextmillis = 0;
     static int32_t percent = pmu_get_battery_percent();
@@ -380,6 +393,7 @@ void pmu_loop( void ) {
             * clear IRQ
             * set update flag
             */
+            log_i("AXP202: ClearingIRQ");
             ttgo->power->clearIRQ();
             pmu_update = true;
         }
@@ -529,13 +543,26 @@ void pmu_standby( void ) {
          * if silence wakeup enabled set the wakeup timer, depending on vplug
          */
         if ( pmu_get_silence_wakeup() ) {
+            mark_time();
             if ( ttgo->power->isChargeing() || ttgo->power->isVBUSPlug() ) {
-                ttgo->power->setTimer( pmu_config.silence_wakeup_interval_vbplug );
-                log_i("enable silence wakeup timer, %dmin", pmu_config.silence_wakeup_interval_vbplug );
+                int vbplugsleeptime = pmu_config.silence_wakeup_interval_vbplug;
+                if (vbplugsleeptime < 2 || vbplugsleeptime > 60) 
+                {
+                    log_w("could not determine the sleep interval while on charge so using 20");
+                    vbplugsleeptime = 20; 
+                }
+                ttgo->power->setTimer(vbplugsleeptime);
+                log_i("enable silence wakeup timer, %dmin", vbplugsleeptime);
             }
             else {
-                ttgo->power->setTimer( pmu_config.silence_wakeup_interval );
-                log_i("enable silence wakeup timer, %dmin", pmu_config.silence_wakeup_interval );
+                int sleepytime = pmu_config.silence_wakeup_interval; 
+                if(sleepytime < 2 || sleepytime > 60)
+                {
+                    log_w("could not determine the sleep interval so using 20");
+                    sleepytime = 20; 
+                }
+                ttgo->power->setTimer(sleepytime);
+                log_i("enable silence wakeup timer, %dmin", sleepytime);
             }
         }
 
@@ -589,6 +616,10 @@ void pmu_wakeup( void ) {
         M5.Axp.RestoreFromLightSleep();
     #elif defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V2 ) || defined( LILYGO_WATCH_2020_V3 )
         TTGOClass *ttgo = TTGOClass::getWatch();
+
+        // record wakeup time here
+        mark_time();
+
         /*
         * set normal voltage depending on settings
         */

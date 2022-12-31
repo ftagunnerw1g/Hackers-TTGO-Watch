@@ -66,24 +66,24 @@ static lv_style_t iconstyle;
 
 icon_t widget_entry[ MAX_WIDGET_NUM ];
 
-LV_FONT_DECLARE(Ubuntu_144px);
-LV_FONT_DECLARE(Ubuntu_72px);
-LV_FONT_DECLARE(Ubuntu_48px);
-LV_FONT_DECLARE(Ubuntu_32px);
-LV_FONT_DECLARE(Ubuntu_16px);
+LV_FONT_DECLARE(LCD_144px);
+LV_FONT_DECLARE(LCD_72px);
+LV_FONT_DECLARE(LCD_48px);
+LV_FONT_DECLARE(LCD_32px);
+LV_FONT_DECLARE(LCD_16px);
 
 #if defined( M5PAPER )
-    lv_font_t *time_font = &Ubuntu_144px;
-    lv_font_t *date_font = &Ubuntu_48px;
-    lv_font_t *info_font = &Ubuntu_32px;
-    lv_font_t *temp_font = &Ubuntu_32px;
-    lv_font_t *icon_font = &Ubuntu_16px;
+    lv_font_t *time_font = &LCD_144px;
+    lv_font_t *date_font = &LCD_48px;
+    lv_font_t *info_font = &LCD_32px;
+    lv_font_t *temp_font = &LCD_32px;
+    lv_font_t *icon_font = &LCD_16px;
 #else
-    lv_font_t *time_font = &Ubuntu_72px;
-    lv_font_t *date_font = &Ubuntu_16px;
-    lv_font_t *info_font = &Ubuntu_16px;    
-    lv_font_t *temp_font = &Ubuntu_16px;    
-    lv_font_t *icon_font = &Ubuntu_16px;
+    lv_font_t *time_font = &LCD_72px;
+    lv_font_t *date_font = &LCD_16px;
+    lv_font_t *info_font = &LCD_16px;    
+    lv_font_t *temp_font = &LCD_16px;    
+    lv_font_t *icon_font = &LCD_16px;
 #endif
 
 lv_task_t * main_tile_task;
@@ -418,8 +418,8 @@ void main_tile_update_time( bool force ) {
             lv_obj_align( datelabel, clock_cont, LV_ALIGN_IN_BOTTOM_MID, 0, 0 );
         }
 
-        snprintf( info_str, sizeof( info_str ),"battery: %d%%", pmu_get_battery_percent() );
-        lv_label_set_text( infolabel, info_str );
+        //snprintf( info_str, sizeof( info_str ),"battery: %d%%", pmu_get_battery_percent() );
+        //lv_label_set_text( infolabel, info_str );
         lv_obj_align( infolabel, datelabel, LV_ALIGN_OUT_TOP_MID, 0, 0 );
         /*
          * Save for next loop

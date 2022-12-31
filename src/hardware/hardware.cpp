@@ -129,7 +129,15 @@ void hardware_setup( void ) {
             M5.begin();
         #elif defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V2 ) || defined( LILYGO_WATCH_2020_V3 )
             TTGOClass *ttgo = TTGOClass::getWatch();
-	    log_i("Starting watch");
+
+            log_i(" ______  ______  ______  ______  ");
+            log_i("/\\  == \\/\\  __ \\/\\  __ \\/\\__  _\\ ");
+            log_i("\\ \\  __<\\ \\ \\/\\ \\ \\ \\/\\ \\/_/\\ \\/ ");
+            log_i(" \\ \\_____\\ \\_____\\ \\_____\\ \\ \\_\\ ");
+            log_i("  \\/_____/\\/_____/\\/_____/  \\/_/ ");
+            log_i("                                 ");                     
+	    log_i("       Now starting watch..      ");
+
             /**
              * lvgl init
              */
@@ -257,7 +265,7 @@ void hardware_post_setup( void ) {
     powermgm_set_event( POWERMGM_WAKEUP );
 
     #ifndef NO_BLUETOOTH
-        blectl_setup();
+      blectl_setup();
     #endif
 
     display_set_brightness( display_get_brightness() );

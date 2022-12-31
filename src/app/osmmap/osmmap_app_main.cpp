@@ -25,7 +25,6 @@
 #include "osmmap_app_main.h"
 #include "app/osmmap/config/osmmap_config.h"
 
-#include "gui/mainbar/setup_tile/bluetooth_settings/bluetooth_message.h"
 #include "gui/mainbar/app_tile/app_tile.h"
 #include "gui/mainbar/main_tile/main_tile.h"
 #include "gui/mainbar/mainbar.h"

@@ -40,6 +40,7 @@ lv_obj_t *battery_view_voltage;
 lv_obj_t *charge_view_current;
 lv_obj_t *discharge_view_current;
 lv_obj_t *vbus_view_voltage;
+lv_obj_t *battery_percent_ind;
 lv_task_t *battery_view_task;
 
 static void enter_battery_settings_event_cb( lv_obj_t * obj, lv_event_t event );
@@ -64,7 +65,7 @@ void battery_view_tile_setup( uint32_t tile_num ) {
 
     lv_obj_t *exit_label = lv_label_create( battery_view_tile, NULL);
     lv_obj_add_style( exit_label, LV_OBJ_PART_MAIN, &battery_view_style );
-    lv_label_set_text( exit_label, "battery / energy");
+    lv_label_set_text( exit_label, "Power status");
     lv_obj_align( exit_label, exit_btn, LV_ALIGN_OUT_RIGHT_MID, 5, 0 );
 
     lv_obj_t *battery_design_cont = lv_obj_create( battery_view_tile, NULL );
@@ -77,7 +78,7 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_align( battery_design_cap_label, battery_design_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
     battery_view_design_cap = lv_label_create( battery_design_cont, NULL);
     lv_obj_add_style( battery_view_design_cap, LV_OBJ_PART_MAIN, &battery_view_style  );
-    lv_label_set_text( battery_view_design_cap, "300mAh");
+    lv_label_set_text( battery_view_design_cap, "???mAh");
     lv_obj_align( battery_view_design_cap, battery_design_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
 
     lv_obj_t *battery_current_cont = lv_obj_create( battery_view_tile, NULL );
@@ -90,7 +91,7 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_align( battery_current_cap_label, battery_current_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
     battery_view_current_cap = lv_label_create( battery_current_cont, NULL);
     lv_obj_add_style( battery_view_current_cap, LV_OBJ_PART_MAIN, &battery_view_style  );
-    lv_label_set_text( battery_view_current_cap, "300mAh");
+    lv_label_set_text( battery_view_current_cap, "???mAh");
     lv_obj_align( battery_view_current_cap, battery_current_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
 
     lv_obj_t *battery_voltage_cont = lv_obj_create( battery_view_tile, NULL );
@@ -103,7 +104,7 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_align( battery_voltage_label, battery_voltage_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
     battery_view_voltage = lv_label_create( battery_voltage_cont, NULL);
     lv_obj_add_style( battery_view_voltage, LV_OBJ_PART_MAIN, &battery_view_style  );
-    lv_label_set_text( battery_view_voltage, "2.4mV");
+    lv_label_set_text( battery_view_voltage, "?.?mV");
     lv_obj_align( battery_view_voltage, battery_voltage_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
 
     lv_obj_t *battery_charge_cont = lv_obj_create( battery_view_tile, NULL );
@@ -116,7 +117,7 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_align( battery_charge_label, battery_charge_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
     charge_view_current = lv_label_create( battery_charge_cont, NULL);
     lv_obj_add_style( charge_view_current, LV_OBJ_PART_MAIN, &battery_view_style  );
-    lv_label_set_text( charge_view_current, "100mA");
+    lv_label_set_text( charge_view_current, "???mA");
     lv_obj_align( charge_view_current, battery_charge_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
 
     lv_obj_t *battery_discharge_cont = lv_obj_create( battery_view_tile, NULL );
@@ -129,7 +130,7 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_align( battery_discharge_label, battery_discharge_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
     discharge_view_current = lv_label_create( battery_discharge_cont, NULL);
     lv_obj_add_style( discharge_view_current, LV_OBJ_PART_MAIN, &battery_view_style  );
-    lv_label_set_text( discharge_view_current, "100mA");
+    lv_label_set_text( discharge_view_current, "???mA");
     lv_obj_align( discharge_view_current, battery_discharge_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
 
     lv_obj_t *vbus_voltage_cont = lv_obj_create( battery_view_tile, NULL );
@@ -142,8 +143,21 @@ void battery_view_tile_setup( uint32_t tile_num ) {
     lv_obj_align( vbus_voltage_label, vbus_voltage_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
     vbus_view_voltage = lv_label_create( vbus_voltage_cont, NULL);
     lv_obj_add_style( vbus_view_voltage, LV_OBJ_PART_MAIN, &battery_view_style  );
-    lv_label_set_text( vbus_view_voltage, "2.4mV");
+    lv_label_set_text( vbus_view_voltage, "?.?mV");
     lv_obj_align( vbus_view_voltage, vbus_voltage_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
+
+    lv_obj_t *battery_percent_cont = lv_obj_create( battery_view_tile, NULL );
+    lv_obj_set_size( battery_percent_cont, lv_disp_get_hor_res( NULL ) , 22 );
+    lv_obj_add_style( battery_percent_cont, LV_OBJ_PART_MAIN, &battery_view_style  );
+    lv_obj_align( battery_percent_cont, vbus_voltage_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 0 );
+    lv_obj_t *battery_percent_label = lv_label_create( battery_percent_cont, NULL);
+    lv_obj_add_style( battery_percent_label, LV_OBJ_PART_MAIN, &battery_view_style  );
+    lv_label_set_text( battery_percent_label, "Percent");
+    lv_obj_align( battery_percent_label, battery_percent_cont, LV_ALIGN_IN_LEFT_MID, 5, 0 );
+    battery_percent_ind = lv_label_create( battery_percent_cont, NULL);
+    lv_obj_add_style( battery_percent_ind, LV_OBJ_PART_MAIN, &battery_view_style  );
+    lv_label_set_text( battery_percent_ind, "??");
+    lv_obj_align( battery_percent_ind, battery_percent_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0 );
 
     mainbar_add_tile_activate_cb( battery_view_tile_num, battery_activate_cb );
     mainbar_add_tile_activate_cb( battery_view_tile_num + 1, battery_activate_cb );
@@ -161,7 +175,7 @@ void battery_hibernate_cb( void ) {
 
 static void enter_battery_settings_event_cb( lv_obj_t * obj, lv_event_t event ) {
     switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( battery_view_tile_num + 1, LV_ANIM_OFF );
+        case( LV_EVENT_CLICKED ):       mainbar_jump_to_tilenumber( battery_view_tile_num - 1, LV_ANIM_OFF );
                                         break;
     }
 
@@ -177,7 +191,8 @@ static void exit_battery_view_event_cb( lv_obj_t * obj, lv_event_t event ) {
 
 void battery_view_update_task( lv_task_t *task ) {
     char temp[16]="";
-
+    
+    delay(500);
     if ( pmu_get_battery_percent( ) >= 0 ) {
         snprintf( temp, sizeof( temp ), "%0.1fmAh", pmu_get_coulumb_data() );
     }
@@ -206,4 +221,9 @@ void battery_view_update_task( lv_task_t *task ) {
     snprintf( temp, sizeof( temp ), "%0.2fV", pmu_get_vbus_voltage() / 1000 );
     lv_label_set_text( vbus_view_voltage, temp );
     lv_obj_align( vbus_view_voltage, lv_obj_get_parent( vbus_view_voltage ), LV_ALIGN_IN_RIGHT_MID, -5, 0 );
+
+    snprintf( temp, sizeof( temp ), "%d", pmu_get_battery_percent() );
+    lv_label_set_text( battery_percent_ind, temp );
+    lv_obj_align( battery_percent_ind, lv_obj_get_parent( battery_percent_ind ), LV_ALIGN_IN_RIGHT_MID, -5, 0 );
+
 }

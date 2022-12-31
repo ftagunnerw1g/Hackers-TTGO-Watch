@@ -119,16 +119,20 @@
      */
     void powermgm_enable_interrupts( void );
     /**
-     * @bried set max performace mode 240/240Mhz (only custom framework)
+     * @brief set max performace mode 240/240Mhz (only custom framework)
      */
     void powermgm_set_perf_mode( void );
     /**
-     * @bried set light performace mode 240/80Mhz (only custom framework)
+     * @brief set light performace mode 240/80Mhz (only custom framework)
      */
     void powermgm_set_boost_mode( void );
     /**
      * @brief set normal mode 160/80Mhz (only custom framework)
      */
     void powermgm_set_normal_mode( void );
+    /**
+     * @brief set eco mode 80/80Mhz (only custom framework)
+     */
+    void powermgm_set_eco_mode( void );
 
 #endif // _POWERMGM_H
