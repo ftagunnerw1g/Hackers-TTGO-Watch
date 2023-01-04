@@ -31,8 +31,9 @@
 
     void sound_a2dp_sink(void);
     void sound_a2dp_source(void);
-    void sound_generate_dtmf( const float mf1, const float mf2 );
-    void sound_generate_sine( const float freq );
+    void  sound_generate_dtmf_string(char *str);
+    void sound_dtmf_task_run(char *str);
+    int sound_generate_sine( const float freq );
 
     /**
      * @brief play MIDI file from SPIFFS by path/filename with soundfont by path/filename
