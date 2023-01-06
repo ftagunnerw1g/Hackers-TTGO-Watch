@@ -90,6 +90,7 @@ void wifictl_setup( void ) {
      */
     esp_wifi_set_bandwidth( ESP_IF_WIFI_STA, WIFI_BW_HT20 );
     esp_wifi_set_ps(WIFI_PS_MAX_MODEM);
+
     /*
      * register WiFi events
      */
@@ -100,7 +101,6 @@ void wifictl_setup( void ) {
         wifictl_send_event_cb( WIFICTL_DISCONNECT, (void *)"scan ..." );
         WiFi.scanNetworks( true );
     }, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
-
 
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
         wifictl_set_event( WIFICTL_ACTIVE );

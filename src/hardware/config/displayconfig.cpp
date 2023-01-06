@@ -45,7 +45,7 @@ bool display_config_t::onLoad(JsonDocument& doc) {
     background_image = doc["background_image"] | 4;
     use_dma = doc["use_dma"] | true;
     use_double_buffering = doc["use_double_buffering"] | false;
-    vibe = doc["vibe"] | true;
+    vibe = doc["vibe"] | false;
 
     return true;
 }

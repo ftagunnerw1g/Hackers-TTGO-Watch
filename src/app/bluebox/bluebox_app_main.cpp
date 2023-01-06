@@ -33,6 +33,7 @@
 #include "gui/widget_factory.h"
 #include "gui/widget_styles.h"
 
+#include "utils/alloc.h"
 #include "hardware/sound.h"
 #include "hardware/blectl.h"
 
@@ -50,9 +51,28 @@ lv_font_t *label_font = &LCD_32px;
 
 lv_task_t * _bluebox_app_task;
 
+char *outsound; 
+
+void sound_mf_task_run(char *str)
+{
+    int x;
+    
+    x = strlen(str) + 1;
+    outsound =  (char *)MALLOC(x);
+    memset(outsound, 0, x);
+    strncpy(outsound,str,strlen(str));
+
+    xTaskCreate     (   mf_app_task,                                    /* Function to implement the task */
+                        "MF Task",                                      /* Name of the task */
+                        2048,                                           /* Stack size in words */
+            (void *)outsound,                                           /* Task input parameter */
+                           1,                                           /* Priority of the task */
+                        NULL);
+}
+
 void replay_handler(char *str)
 {
-    sound_dtmf_task_run(str);
+    sound_mf_task_run(str);
 }
 
 void label_update(const char *str)

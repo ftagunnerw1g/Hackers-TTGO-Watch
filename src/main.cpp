@@ -13,6 +13,7 @@
 #include "app/alarm_clock/alarm_clock.h"
 
 #include "app/bluebox/bluebox_app.h"
+#include "app/silverbox/silverbox_app.h"
 #include "app/netscan/netscan_app.h"
 #include "app/ping/ping_app.h"
 #include "app/sshclient/sshclient_app.h"
@@ -50,6 +51,7 @@ void setup() {
      */
 #if defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V3 )
     bluebox_app_setup();
+    silverbox_app_setup();
 #endif 
     netscan_app_setup();
     subnet_app_setup();

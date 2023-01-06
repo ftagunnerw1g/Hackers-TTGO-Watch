@@ -65,6 +65,8 @@
 	AudioFileSourceSPIFFS *midi_sf2;
 
         AudioFileSourceFunction* funsource;
+        AudioFileSourceFunction* mf_funsource;
+        AudioFileSourceFunction* dt_funsource;
 
         AudioGeneratorMP3 *mp3;
         AudioGeneratorWAV *wav;
@@ -81,7 +83,9 @@
 bool sound_init = false;
 bool is_speaking = false;
 bool is_bt = false; 
-char *gostring; 
+
+char *mf_insound; 
+char *dt_insound; 
 
 sound_config_t sound_config;
 
@@ -334,7 +338,8 @@ float sound_generate_dual_tone(const float time)
     return v;
 }
 
-int sound_generate_sine( const float freq ) {
+int sound_generate_sine( const float freq ) 
+{
     /**
      * check if sound available
      */
@@ -365,7 +370,7 @@ int sound_generate_sine( const float freq ) {
 #endif
 }
 
-void sound_generate_dtmf_string(char *str) 
+void sound_generate_mf_string(char *str) 
 {
     int x, len;
 
@@ -392,7 +397,7 @@ void sound_generate_dtmf_string(char *str)
                 return; 
             }
             sound_set_enabled( sound_config.enable );
-            
+
 	    for (x = 0; x< len; x++)
 	    {
 		switch(str[x]) 
@@ -453,10 +458,10 @@ void sound_generate_dtmf_string(char *str)
                         tone2 = 0.f; 
 			break;
 		}
-                funsource = new AudioFileSourceFunction(.5);
-                funsource->addAudioGenerators(sound_generate_dual_tone);
-                wav->begin(funsource, out);
-                delay(600);
+                mf_funsource = new AudioFileSourceFunction(.4);
+                mf_funsource->addAudioGenerators(sound_generate_dual_tone);
+                wav->begin(mf_funsource, out);
+                delay(500);
                  if ( wav->isRunning()) {
 	             wav->stop();
                  }
@@ -470,30 +475,140 @@ void sound_generate_dtmf_string(char *str)
 #endif
 }
 
-void dtmf_app_task(void * pvParameters)
+void sound_generate_dtmf_string(char *str) 
 {
-    sound_generate_dtmf_string((char *)pvParameters);
+    int x, len;
+
+    /**
+     * check if sound available
+     */
+    if( !sound_get_available() ) {
+        return;
+    }
+#ifdef NATIVE_64BIT
+
+#else
+    #if defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V3 )
+        if(wav->isRunning()) 
+        {
+            return;  
+        }
+
+        if ( sound_config.enable && sound_init && !sound_is_silenced() && !wav->isRunning() ) 
+        {
+            len = strlen(str);
+            if(len <= 0)
+            {
+                return; 
+            }
+            sound_set_enabled( sound_config.enable );
+
+	    for (x = 0; x< len; x++)
+	    {
+		switch(str[x]) 
+                {
+		    case '1':
+                        tone1 = 697.f; 
+                        tone2 = 1209.f; 
+			break;
+		    case '2':
+                        tone1 = 697.f; 
+                        tone2 = 1336.f; 
+			break;
+		    case '3':
+                        tone1 = 697.f; 
+                        tone2 = 1477.f; 
+			break;
+		    case '4':
+                        tone1 = 770.f; 
+                        tone2 = 1209.f; 
+			break;
+		    case '5':
+                        tone1 = 770.f; 
+                        tone2 = 1336.f; 
+			break;
+		    case '6':
+                        tone1 = 770.f; 
+                        tone2 = 1477.f; 
+			break;
+		    case '7':
+                        tone1 = 852.f; 
+                        tone2 = 1209.f; 
+			break;
+		    case '8':
+                        tone1 = 852.f; 
+                        tone2 = 1336.f; 
+			break;
+		    case '9':
+                        tone1 = 852.f; 
+                        tone2 = 1477.f; 
+			break;
+		    case '0':
+                        tone1 = 941.f; 
+                        tone2 = 1336.f; 
+			break;
+                    case 'A': 
+                        tone1 = 697.f; 
+                        tone2 = 1633.f; 
+                        break;
+                    case 'B':
+                        tone1 = 770.f; 
+                        tone2 = 1633.f; 
+                        break;
+                    case 'C':
+                        tone1 = 852.f;
+                        tone2 = 1633.f;
+                        break;
+                    case 'D': 
+                        tone1 = 941.f; 
+                        tone2 = 1633.f; 
+                        break;
+                    case '*':
+                        tone1 = 941.f; 
+                        tone2 = 1209.f; 
+                        break;
+                    case '#':
+                        tone1 = 941.f; 
+                        tone2 = 1477.f; 
+                        break;
+		}
+                dt_funsource = new AudioFileSourceFunction(.4);
+                dt_funsource->addAudioGenerators(sound_generate_dual_tone);
+                wav->begin(dt_funsource, out);
+                delay(500);
+                 if ( wav->isRunning()) {
+	             wav->stop();
+                 }
+            }
+          return; 
+        } else {
+            log_i("Cannot generate DTMF, sound is disabled");
+            return; 
+        }
+    #endif
+#endif
+}
+
+void mf_app_task(void * pvParameters)
+{
+    mf_insound = (char *)pvParameters; 
+
+    sound_generate_mf_string(mf_insound);
     vTaskDelay(100);
-    free(gostring);
-    gostring = NULL; 
+    free(mf_insound); 
+    mf_insound = NULL; 
     vTaskDelete(NULL);
 }
 
-void sound_dtmf_task_run(char *str)
+void dtmf_app_task(void * pvParameters)
 {
-    int x; 
-    
-    x = strlen(str) + 1;
-    gostring = (char *)MALLOC(x); 
-    memset(gostring, 0, x); 
-    strncpy(gostring,str,x);
+    dt_insound = (char *)pvParameters; 
 
-    xTaskCreate     (   dtmf_app_task,	                                /* Function to implement the task */
-                        "DTMF Task",                                    /* Name of the task */ 
-                        2048,                                           /* Stack size in words */
-                 (void *)gostring,                                      /* Task input parameter */
-                           1,                                           /* Priority of the task */
-                        NULL);
+    sound_generate_dtmf_string(dt_insound);
+    vTaskDelay(100);
+    free(dt_insound); 
+    dt_insound = NULL; 
+    vTaskDelete(NULL);
 }
 
 // The supported audio codec in ESP32 A2DP is SBC. SBC audio stream is encoded

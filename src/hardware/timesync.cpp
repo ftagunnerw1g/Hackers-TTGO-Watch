@@ -130,12 +130,24 @@ bool timesync_powermgm_event_cb( EventBits_t event, void *arg ) {
 
 bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
 #ifndef NATIVE_64BIT
+    time_t now;
+    struct tm info;
+    /*
+    * copy current time into now and convert it local time info
+    */
+    time( &now );
+    localtime_r( &now, &info );
+
+    int h = info.tm_hour;
+    int m = info.tm_min;
+
     switch ( event ) {
         case WIFICTL_CONNECT:
             /*
              * sync time when autosync is enabled
              */ 
-            if ( timesync_config.timesync ) {
+            if ( timesync_config.timesync ) 
+            {
                 /*
                  * check if another sync request is running
                  */
@@ -143,16 +155,16 @@ bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
                     break;
                 }
                 else {
-                    /*
-                     * start timesync task
-                     */
-                    xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
-                    xTaskCreate(    timesync_Task,       /* Function to implement the task */
-                                    "timesync Task",     /* Name of the task */
-                                    2000,                /* Stack size in words */
-                                    NULL,                /* Task input parameter */
-                                    1,                   /* Priority of the task */
-                                    &_timesync_Task );   /* Task handle. */
+		/*
+		 * start timesync task
+		 */
+		xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
+		xTaskCreate(    timesync_Task,       /* Function to implement the task */
+				"timesync Task",     /* Name of the task */
+				2000,                /* Stack size in words */
+				NULL,                /* Task input parameter */
+				1,                   /* Priority of the task */
+				&_timesync_Task );   /* Task handle. */
                 }
             }
             break;
