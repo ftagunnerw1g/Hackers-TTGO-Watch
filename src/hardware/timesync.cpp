@@ -159,8 +159,9 @@ bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
 		 * start timesync task if we're at sync hour
                  *  (can't see much point in doing it more often)
 		 */
-                    if((h == timesync_config.synchour) && (m < 30))
+                    if(((h == timesync_config.synchour) && (m < 30)) || (timesync_config.synchour == 99))
                     {
+                        log_i("performing ntp sync as hour now %d", timesync_config.synchour);
 		        xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
 		        xTaskCreate(    timesync_Task,       /* Function to implement the task */
 		    	    	        "timesync Task",     /* Name of the task */
@@ -172,6 +173,10 @@ bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
                     else
                     {
                         log_i("next ntp sync is scheduled during hour %d", timesync_config.synchour); 
+                    }
+                    if(timesync_config.synchour == 99)
+                    {
+                        timesync_config.synchour = 2;
                     }
                 }
             }
