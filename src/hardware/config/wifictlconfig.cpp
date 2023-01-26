@@ -36,7 +36,10 @@ bool wifictl_config_t::onSave(JsonDocument& doc) {
      * save config structure into json file
      */
     doc["autoon"] = autoon;
-    doc["hostname"] = hostname;
+    if(hostname)
+    {
+      doc["hostname"] = hostname;
+    }
     doc["webserver"] = webserver;
 
     doc["enable_on_standby"] = enable_on_standby;
@@ -49,13 +52,15 @@ bool wifictl_config_t::onSave(JsonDocument& doc) {
 }
 
 bool wifictl_config_t::onLoad(JsonDocument& doc) {
+    log_i("wifictl onLoad"); 
+
     /*
      * allocate networklist if needed
      */
     if ( networklist == NULL ) {
         networklist = ( wifictl_networklist* )CALLOC( sizeof( wifictl_networklist ) * NETWORKLIST_ENTRYS, 1 );
         if( !networklist ) {
-            log_e("wifictl_networklist calloc faild");
+            log_e("wifictl_networklist calloc failed");
             while(true);
         }
     }
@@ -98,10 +103,13 @@ bool wifictl_config_t::onDefault( void ) {
     /*
      * allocate networklist if needed
      */
+
+    log_i("wifictl onDefault");
+
     if ( networklist == NULL ) {
         networklist = ( wifictl_networklist* )CALLOC( sizeof( wifictl_networklist ) * NETWORKLIST_ENTRYS, 1 );
         if( !networklist ) {
-            log_e("wifictl_networklist calloc faild");
+            log_e("wifictl_networklist calloc failed");
             while(true);
         }
     }
