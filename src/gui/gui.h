@@ -28,12 +28,6 @@
      */
     void gui_setup( void );
     /**
-     * @brief set the background
-     * 
-     * @param   background_image    background image index 0...4
-     */
-    void gui_set_background_image ( uint32_t background_image);
-    /**
      * @brief force a complete redraw cycle on next gui cycle
      * 
      * @param force  true for redraw

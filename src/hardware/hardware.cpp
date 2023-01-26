@@ -137,6 +137,7 @@ void hardware_setup( void ) {
             log_i("  \\/_____/\\/_____/\\/_____/  \\/_/ ");
             log_i("                                 ");                     
 	    log_i("       Now starting watch..      ");
+	    log_i("                                 ");
 
             /**
              * lvgl init

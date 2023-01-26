@@ -28,6 +28,7 @@ bool timesync_config_t::onSave(JsonDocument& doc) {
     doc["daylightsave"] = daylightsave;
     doc["timesync"] = timesync;
     doc["timezone"] = timezone;
+    doc["synchour"] = synchour; 
     doc["use_24hr_clock"] = use_24hr_clock;
     doc["timezone_name"] = timezone_name;
     doc["timezone_rule"] = timezone_rule;
@@ -39,6 +40,7 @@ bool timesync_config_t::onLoad(JsonDocument& doc) {
     daylightsave = doc["daylightsave"] | false;
     timesync = doc["timesync"] | true;
     timezone = doc["timezone"] | 0;
+    synchour = doc["synchour"] | 2;
     use_24hr_clock = doc["use_24hr_clock"] | true;
     strncpy( timezone_name, doc["timezone_name"] | TIMEZONE_NAME_DEFAULT, sizeof( timezone_name ) );
     strncpy( timezone_rule, doc["timezone_rule"] | TIMEZONE_RULE_DEFAULT, sizeof( timezone_rule ) );

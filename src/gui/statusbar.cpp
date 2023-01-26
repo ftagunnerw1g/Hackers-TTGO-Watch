@@ -466,16 +466,6 @@ bool statusbar_displayctl_event_cb( EventBits_t event, void *arg ) {
 static void statusbar_pmuctl_update_batt( int32_t percent, bool charging, bool plug) {
     char level[8]="";
 
-    //if ( percent >= 0 && percent <= 100 ) {
-    //    snprintf( level, sizeof( level ), "%d%%", percent );
-    //}
-    //else if ( percent > 100 ) {
-    //    snprintf( level, sizeof( level ), "!%d%%", percent );
-    //}
-    //else {
-    //    snprintf( level, sizeof( level ), "?" );
-    //    percent = 0;
-    //}
     lv_label_set_text( statusicon[  STATUSBAR_BATTERY_PERCENT ].icon, (const char *)level );
     if ( !plug ) {
         if ( percent >= 75 ) { 
@@ -736,18 +726,18 @@ void statusbar_wifi_event_cb( lv_obj_t *wifi, lv_event_t event ) {
     switch ( event ) {
         case ( LV_EVENT_VALUE_CHANGED ):
             switch ( lv_imgbtn_get_state( wifi ) ) {
-                case( LV_BTN_STATE_CHECKED_RELEASED ):  wifictl_off();
-                                                        wifictl_set_autoon( false );
+                case( LV_BTN_STATE_CHECKED_RELEASED ):  wifictl_set_autoon( false );
+                                                        wifictl_off();
                                                         break;
-                case( LV_BTN_STATE_RELEASED ):          wifictl_on();
-                                                        wifictl_set_autoon( true );
+
+                case( LV_BTN_STATE_RELEASED ):          wifictl_set_autoon( true );
+                                                        wifictl_on();
                                                         break;
             }
             statusbar_refresh_update = true;
             break;
         case ( LV_EVENT_LONG_PRESSED ):             
             statusbar_expand( false );
-//            mainbar_jump_to_tilenumber(wifi_get_setup_tile_num(), LV_ANIM_OFF);
             break;
     }
     statusbar_refresh_update = true;
@@ -775,7 +765,6 @@ void statusbar_gps_event_cb( lv_obj_t *gps, lv_event_t event ) {
             break;
         case ( LV_EVENT_LONG_PRESSED ):             
             statusbar_expand( false );
-//            mainbar_jump_to_tilenumber( gps_get_setup_tile_num() , LV_ANIM_OFF);
             statusbar_refresh_update = true;
             break;
     }
@@ -807,7 +796,6 @@ void statusbar_bluetooth_event_cb( lv_obj_t *bluetooth, lv_event_t event ) {
             break;
         case ( LV_EVENT_LONG_PRESSED ):             
             statusbar_expand( false );
-//            mainbar_jump_to_tilenumber(bluetooth_get_setup_tile_num(), LV_ANIM_OFF);
             break;
     }
     statusbar_refresh_update = true;

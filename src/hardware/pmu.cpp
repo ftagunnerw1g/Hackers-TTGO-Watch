@@ -219,6 +219,7 @@ void mark_time(void)
     timer = time(NULL);
     tm_info = localtime(&timer);
 
+    memset(timebuffer, 0, 26);
     strftime(timebuffer, 26, "%Y-%m-%d %H:%M:%S", tm_info); 
     log_i("%s", timebuffer);
 }
@@ -546,7 +547,7 @@ void pmu_standby( void ) {
             mark_time();
             if ( ttgo->power->isChargeing() || ttgo->power->isVBUSPlug() ) {
                 int vbplugsleeptime = pmu_config.silence_wakeup_interval_vbplug;
-                if (vbplugsleeptime < 2 || vbplugsleeptime > 60) 
+                if ((vbplugsleeptime < 2) || (vbplugsleeptime > 60)) 
                 {
                     log_w("could not determine the sleep interval while on charge so using 20");
                     vbplugsleeptime = 20; 
@@ -556,7 +557,7 @@ void pmu_standby( void ) {
             }
             else {
                 int sleepytime = pmu_config.silence_wakeup_interval; 
-                if(sleepytime < 2 || sleepytime > 60)
+                if((sleepytime < 2) || (sleepytime > 60))
                 {
                     log_w("could not determine the sleep interval so using 20");
                     sleepytime = 20; 

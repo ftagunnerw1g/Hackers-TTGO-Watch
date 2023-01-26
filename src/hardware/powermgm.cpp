@@ -216,11 +216,10 @@ void powermgm_loop( void ) {
             #ifdef NATIVE_64BIT
 
             #else
-                setCpuFrequencyMhz( 80 );
-                log_i("CPU speed = 80MHz, start light sleep");
-
+                log_i("CPU 80MHz");
                 // delay usually prevents sleep before we've got all output etc
-                delay(250);
+                delay(500);
+                setCpuFrequencyMhz( 80 );
 
                 esp_sleep_enable_timer_wakeup( 20 * 60 * 1000000 );
                 esp_light_sleep_start();

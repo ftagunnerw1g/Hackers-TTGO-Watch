@@ -123,18 +123,6 @@
      */
     void display_set_block_return_maintile( bool block_return_maintile );
     /**
-     * @brief get the background for the display
-     * 
-     * @return image number
-     */
-    uint32_t display_get_background_image( void );
-    /**
-     * @brief set the background for the display
-     * 
-     * @param background_image image number
-     */
-    void display_set_background_image( uint32_t background_image );
-    /**
      * @brief set the vibe feedback
      * 
      * @param vibe true or false, true for enabling touch feeback

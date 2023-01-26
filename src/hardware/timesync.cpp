@@ -57,7 +57,7 @@ void timesync_setup( void ) {
         */
         time_event_handle = xEventGroupCreate();
         /*
-        * register wigi, ble and powermgm callback function
+        * register wifi, ble and powermgm callback function
         */
         wifictl_register_cb( WIFICTL_CONNECT, timesync_wifictl_event_cb, "wifictl timesync" );
         blectl_register_cb( BLECTL_MSG, timesync_blectl_event_cb, "blectl timesync" );
@@ -156,15 +156,23 @@ bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
                 }
                 else {
 		/*
-		 * start timesync task
+		 * start timesync task if we're at sync hour
+                 *  (can't see much point in doing it more often)
 		 */
-		xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
-		xTaskCreate(    timesync_Task,       /* Function to implement the task */
-				"timesync Task",     /* Name of the task */
-				2000,                /* Stack size in words */
-				NULL,                /* Task input parameter */
-				1,                   /* Priority of the task */
-				&_timesync_Task );   /* Task handle. */
+                    if((h == timesync_config.synchour) && (m < 30))
+                    {
+		        xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
+		        xTaskCreate(    timesync_Task,       /* Function to implement the task */
+		    	    	        "timesync Task",     /* Name of the task */
+				        2000,                /* Stack size in words */
+				        NULL,                /* Task input parameter */
+				        1,                   /* Priority of the task */
+				        &_timesync_Task );   /* Task handle. */
+                    }
+                    else
+                    {
+                        log_i("next ntp sync is scheduled during hour %d", timesync_config.synchour); 
+                    }
                 }
             }
             break;
@@ -180,10 +188,12 @@ bool timesync_blectl_event_cb( EventBits_t event, void *arg ) {
     struct timeval new_now;
 
 #ifndef NATIVE_64BIT
-    switch( event ) {
+    switch( event ) 
+    {
         case BLECTL_MSG:
             settime_str = strstr( (const char*)arg, "setTime(" );
-            if ( settime_str ) {
+            if ( settime_str ) 
+            {
                 settime_str = settime_str + 8;
                 time( &now );
                 log_i("old time: %d", now );

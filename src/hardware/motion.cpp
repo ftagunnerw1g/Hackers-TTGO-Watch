@@ -128,6 +128,10 @@ void bma_setup( void ) {
      * load config from json
      */
     bma_config.load();
+  //health_config.load(); XXX
+  //XXX HERE we should account for saved data from the last run ?
+  // stepcounter = stepcounter + saved_step_counter;  
+
     #ifdef NATIVE_64BIT
     #else
         #ifdef M5PAPER
@@ -163,6 +167,7 @@ void bma_setup( void ) {
      * load config setting for tilt, stepcounter and wakeup to enabled interrupts
      */
     bma_reload_settings();
+ // health_config_reload_settings(); XXX
     /*
      * register powermgm callback funtions
      */

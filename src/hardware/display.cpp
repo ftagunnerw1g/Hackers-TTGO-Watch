@@ -356,14 +356,6 @@ void display_set_rotation( uint32_t rotation ) {
     lv_obj_invalidate( lv_scr_act() );
 }
 
-uint32_t display_get_background_image( void ) {
-    return( display_config.background_image );
-}
-
-void display_set_background_image( uint32_t background_image ) {
-    display_config.background_image = background_image;
-}
-
 void display_set_vibe( bool vibe ) {
     display_config.vibe = vibe;
 }

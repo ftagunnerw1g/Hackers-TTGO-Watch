@@ -45,8 +45,7 @@
         bool block_return_maintile = false;             /** @brief block back to main tile on standby */
         bool use_dma = true;                            /** @brief use dma framebuffer */
         bool use_double_buffering = false;              /** @brief use double framebuffer */
-        bool vibe = true;                               /** @brief vibe for touch feedback */
-        uint32_t background_image = 4;                  /** @brief background image */
+        bool vibe = false;                              /** @brief vibe for touch feedback */
 
         protected:
         ////////////// Available for overloading: //////////////

@@ -77,13 +77,6 @@ void gui_setup( void ) {
      * files begin with "P:/foo.bar" -> "/spiffs/foo.bar"
      */
     lv_fs_if_spiffs_init();
-    /*
-     * Create an blank wallpaper
-     */
-    img_bin = lv_img_create( lv_scr_act() , NULL );
-    lv_obj_set_width( img_bin, lv_disp_get_hor_res( NULL ) );
-    lv_obj_set_height( img_bin, lv_disp_get_ver_res( NULL ) );
-    lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
 
     log_i("mainbar setup");
     mainbar_setup();
@@ -133,10 +126,7 @@ void gui_setup( void ) {
      * trigger an activity
      */
     lv_disp_trig_activity( NULL );
-    /*
-     * setup background image
-     */
-    gui_set_background_image( display_get_background_image() );
+
     /*
      * register the main powermgm routine for the gui
      */
@@ -212,58 +202,6 @@ bool gui_powermgm_event_cb( EventBits_t event, void *arg ) {
 
 void gui_force_redraw( bool force ) {
     force_redraw = force;
-}
-
-void gui_set_background_image ( uint32_t background_image ) {
-    switch ( background_image ) {
-        case 0:
-            LV_IMG_DECLARE( bg );
-            lv_img_set_src( img_bin, &bg );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 1:
-            LV_IMG_DECLARE( bg1 );
-            lv_img_set_src( img_bin, &bg1 );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 2:
-            LV_IMG_DECLARE( bg2 );
-            lv_img_set_src( img_bin, &bg2 );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 3:
-            LV_IMG_DECLARE( bg3 );
-            lv_img_set_src( img_bin, &bg3 );
-            lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-            lv_obj_set_hidden( img_bin, false );
-            break;
-        case 4:
-            lv_obj_set_hidden( img_bin, true );
-            break;
-        case 5: {
-            FILE* file;
-            char filename[256] = "";
-            filepath_convert( filename, sizeof( filename ), BACKGROUNDIMAGE );
-            file = fopen( filename, "rb" );
-            if ( file ) {
-                log_i("set custom background image from spiffs");
-                fclose( file );
-                lv_img_set_src( img_bin, filename );
-                lv_obj_align( img_bin, NULL, LV_ALIGN_CENTER, 0, 0 );
-                lv_obj_set_hidden( img_bin, false );
-            }
-            else {
-                log_i("not custom background image found on spiffs, set to black");
-                lv_obj_set_hidden( img_bin, true );
-            }
-            break;
-        }
-        default:
-            lv_obj_set_hidden( img_bin, true ); 
-    }
 }
 
 bool gui_powermgm_loop_event_cb( EventBits_t event, void *arg ) {

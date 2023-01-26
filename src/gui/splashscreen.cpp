@@ -104,12 +104,12 @@ void splash_screen_stage_one( void ) {
             TTGOClass *ttgo = TTGOClass::getWatch();
             for( int bl = 0 ; bl < display_get_brightness() ; bl++ ) {
                 ttgo->bl->adjust( bl );
-                delay(5);
+                delay(15);
             }   
         #elif defined( LILYGO_WATCH_2021 )   
             for( int bl = 0 ; bl < display_get_brightness() ; bl++ ) {
                 ledcWrite(0, bl );
-                delay(5);
+                delay(15);
             }            
         #endif
     #endif
@@ -136,12 +136,12 @@ void splash_screen_stage_finish( void ) {
 
             for( int bl = display_get_brightness() ; bl >= 0 ; bl-- ) {
                 ttgo->bl->adjust( bl );
-                delay(5);
+                delay(15);
             }
         #elif defined( LILYGO_WATCH_2021 )   
             for( int bl = display_get_brightness() ; bl >= 0 ; bl-- ) {
                 ledcWrite(0, bl );
-                delay(5);
+                delay(15);
             }   
         #endif
     #endif

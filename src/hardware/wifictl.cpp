@@ -99,13 +99,14 @@ void wifictl_setup( void ) {
         wifictl_clear_event( WIFICTL_OFF_REQUEST | WIFICTL_ON_REQUEST | WIFICTL_SCAN | WIFICTL_CONNECT );
         wifictl_set_event( WIFICTL_SCAN );
         wifictl_send_event_cb( WIFICTL_DISCONNECT, (void *)"scan ..." );
-        WiFi.scanNetworks( true );
+        WiFi.scanNetworks( true, false, true, 90 );
     }, WiFiEvent_t::SYSTEM_EVENT_STA_DISCONNECTED);
 
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
         wifictl_set_event( WIFICTL_ACTIVE );
         wifictl_clear_event( WIFICTL_OFF_REQUEST | WIFICTL_ON_REQUEST | WIFICTL_SCAN | WIFICTL_CONNECT );
         int len = WiFi.scanComplete();
+        log_i("WiFi scan complete with %d entries found", len);
         /**
          * send scan done event
          */
@@ -116,7 +117,7 @@ void wifictl_setup( void ) {
          */
         for( int i = 0 ; i < len ; i++ ) {
             wifictl_send_event_cb( WIFICTL_SCAN_ENTRY, (void *)WiFi.SSID(i).c_str() );
-            log_i("found network entry %s with %d rssi", WiFi.SSID(i).c_str(), WiFi.RSSI(i) );
+            log_i("%s with %d rssi", WiFi.SSID(i).c_str(), WiFi.RSSI(i) );
         }
         /**
          * connect if we discover a known network, but skip the ones that were already tried
@@ -130,7 +131,7 @@ void wifictl_setup( void ) {
                     wifictl_send_event_cb( WIFICTL_MSG, (void *)"connecting ..." );
                     WiFi.setHostname(wifictl_config.hostname);
                     WiFi.begin( wifictl_config.networklist[ entry ].ssid, wifictl_config.networklist[ entry ].password );
-                    log_d("try to connect to network entry %s with %d rssi", WiFi.SSID(i).c_str(), WiFi.RSSI(i) );
+                    log_d("connect to network entry %s with %d rssi", WiFi.SSID(i).c_str(), WiFi.RSSI(i) );
                 }
             }
         }
@@ -160,7 +161,7 @@ void wifictl_setup( void ) {
        wifictl_clear_event( WIFICTL_CONNECT | WIFICTL_OFF_REQUEST | WIFICTL_ON_REQUEST );
        wifictl_set_event( WIFICTL_SCAN );
        wifictl_send_event_cb( WIFICTL_ON, (void *)"scan ..." );
-       WiFi.scanNetworks( true );
+       WiFi.scanNetworks( true, false, true, 90 );
     }, WiFiEvent_t::SYSTEM_EVENT_WIFI_READY );
 
     WiFi.onEvent([](WiFiEvent_t event, WiFiEventInfo_t info) {
@@ -409,8 +410,8 @@ bool wifictl_insert_network( const char *ssid, const char *password ) {
         strncpy( wifictl_config.networklist[ entry ].password, password, sizeof( wifictl_config.networklist[ entry ].password ) );
         wifictl_save_config();
 #ifndef NATIVE_64BIT
-        WiFi.scanNetworks( true );
-        wifictl_set_event( WIFICTL_SCAN );
+        WiFi.scanNetworks(true, false, true, 90);
+        wifictl_set_event(WIFICTL_SCAN);
 #endif
         retval = true;
         return( retval );
@@ -425,7 +426,7 @@ bool wifictl_insert_network( const char *ssid, const char *password ) {
         strncpy( wifictl_config.networklist[ entry ].password, password, sizeof( wifictl_config.networklist[ entry ].password ) );
         wifictl_save_config();
 #ifndef NATIVE_64BIT
-        WiFi.scanNetworks( true );
+        WiFi.scanNetworks(true, false, true, 90);
         wifictl_set_event( WIFICTL_SCAN );
 #endif
         retval = true;
@@ -451,6 +452,7 @@ void wifictl_on( void ) {
     }
     wifictl_set_event( WIFICTL_ON_REQUEST | WIFICTL_FIRST_RUN );
 #ifndef NATIVE_64BIT
+    log_i("resuming _wifictl_Task");
     vTaskResume( _wifictl_Task );
 #endif
 }
@@ -564,26 +566,32 @@ void wifictl_Task( void * pvParameters ) {
     log_i("start wifictl task, heap: %d", ESP.getFreeHeap() );
 
     while ( true ) {
-        vTaskDelay( 100 );
-        if ( wifictl_get_event( WIFICTL_OFF_REQUEST ) && wifictl_get_event( WIFICTL_ON_REQUEST ) ) {
+        vTaskDelay(100);
+        if ( wifictl_get_event( WIFICTL_OFF_REQUEST ) && wifictl_get_event( WIFICTL_ON_REQUEST ) ) 
+        {
             log_w("confused by wifictl on/off at the same time. off request accept");
         }
 
-        if ( wifictl_get_event( WIFICTL_OFF_REQUEST ) ) {
-            log_i("request wifictl off");
+        if ( wifictl_get_event( WIFICTL_OFF_REQUEST ) ) 
+        {
+            log_i("wifictl_Task (wifi thread) request wifictl off");
             WiFi.mode( WIFI_OFF );
+            vTaskDelay(150);
             esp_wifi_stop();
+            wifictl_clear_event( WIFICTL_ON | WIFICTL_OFF);
             wifictl_set_event( WIFICTL_OFF );
-            wifictl_clear_event( WIFICTL_ON );
         }
-        else if ( wifictl_get_event( WIFICTL_ON_REQUEST ) ) {
-            log_i("request wifictl on");
+        else if ( wifictl_get_event( WIFICTL_ON_REQUEST ) ) 
+        {
+            log_i("wifictl_Task (wifi thread) request wifictl on");
             esp_wifi_start();
+            vTaskDelay(150);
             WiFi.mode( WIFI_STA );
+            wifictl_clear_event( WIFICTL_OFF | WIFICTL_ON );
             wifictl_set_event( WIFICTL_ON );
-            wifictl_clear_event( WIFICTL_OFF );
         }
         wifictl_clear_event( WIFICTL_OFF_REQUEST | WIFICTL_ACTIVE | WIFICTL_CONNECT | WIFICTL_SCAN | WIFICTL_ON_REQUEST );
+        vTaskDelay(100);
         vTaskSuspend( _wifictl_Task );
     }
 }

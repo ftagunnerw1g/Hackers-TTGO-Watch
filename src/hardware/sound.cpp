@@ -74,6 +74,37 @@
 
         AudioFileSourcePROGMEM *progmem_file;
     #elif defined( LILYGO_WATCH_2020_V2 )
+        #include "TTGO.h"
+
+        #include "AudioFileSourceSPIFFS.h"
+        #include "AudioFileSourcePROGMEM.h"
+        #include "AudioFileSourceFunction.h"
+        #include "AudioFileSourceID3.h"
+        #include "AudioGeneratorMP3.h"
+        #include "AudioGeneratorWAV.h"
+        #include "AudioGeneratorMIDI.h"
+
+        #include "BluetoothA2DPSource.h"
+
+        #define c3_frequency  130.81
+
+        AudioFileSourceSPIFFS *spliffs_file;
+        AudioFileSourceID3 *id3;
+
+        BluetoothA2DPSource a2dp_source;
+
+	// midi soundfont
+	AudioFileSourceSPIFFS *midi_sf2;
+
+        AudioFileSourceFunction* funsource;
+        AudioFileSourceFunction* mf_funsource;
+        AudioFileSourceFunction* dt_funsource;
+
+        AudioGeneratorMP3 *mp3;
+        AudioGeneratorWAV *wav;
+	AudioGeneratorMIDI *midi;
+
+        AudioFileSourcePROGMEM *progmem_file;
     #elif defined( LILYGO_WATCH_2021 )    
     #else
         #warning "no hardware driver for sound"
@@ -302,6 +333,7 @@ void sound_set_enabled( bool enabled ) {
 
 void sound_a2dp_sink(void) 
 {
+#if defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V3 )
     if( sound_config.enable && sound_init && !sound_is_silenced() && blectl_get_autoon() ) 
     {
         is_bt = true;
@@ -318,6 +350,7 @@ void sound_a2dp_sink(void)
     {
         log_i("Cannot enable A2DP sink per settings");
     }
+#endif
 }
 
 float tone1, tone2; 
