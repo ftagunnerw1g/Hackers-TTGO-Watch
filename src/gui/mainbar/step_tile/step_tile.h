@@ -1,9 +1,3 @@
-/****************************************************************************
- *   Tu May 22 21:23:51 2020
- *   Copyright  2020  Dirk Brosswick
- *   Email: dirk.brosswick@googlemail.com
- ****************************************************************************/
- 
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,23 +13,18 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#include "motorconfig.h"
+#ifndef _STEP_TILE_H
+    #define _STEP_TILE_H
 
-motor_config_t::motor_config_t() : BaseJsonConfig(MOTOR_JSON_CONFIG_FILE) {
-}
+    /**
+     * @brief setup step tile
+     */
+    void step_tile_setup( void );
+    /**
+     * @brief get the tile number for the step tile
+     * 
+     * @return  tile number
+     */
+    uint32_t step_tile_get_tile_num( void );
 
-bool motor_config_t::onSave(JsonDocument& doc) {
-    doc["motor"] = vibe;
-
-    return true;
-}
-
-bool motor_config_t::onLoad(JsonDocument& doc) {
-    vibe = doc["motor"].as<bool>() | false;
-
-    return true;
-}
-
-bool motor_config_t::onDefault( void ) {
-    return true;
-}
+#endif // _STEP_TILE_H

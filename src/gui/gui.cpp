@@ -33,6 +33,7 @@
 #include "mainbar/main_tile/main_tile.h"
 #include "mainbar/app_tile/app_tile.h"
 #include "mainbar/note_tile/note_tile.h"
+#include "mainbar/step_tile/step_tile.h"
 #include "mainbar/setup_tile/setup_tile.h"
 #include "mainbar/setup_tile/display_settings/display_settings.h"
 #include "mainbar/setup_tile/gps_settings/gps_settings.h"
@@ -81,7 +82,7 @@ void gui_setup( void ) {
     log_i("mainbar setup");
     mainbar_setup();
     /*
-     * add the four mainbar screens
+     * add the mainbar screens
      */
     log_i("mainbar tile setup");
     main_tile_setup();
@@ -89,6 +90,8 @@ void gui_setup( void ) {
     app_tile_setup();
     log_i("note tile setup");
     note_tile_setup();
+    log_i("step tile setup");
+    step_tile_setup();
     log_i("setup tile setup");
     setup_tile_setup();
     /*

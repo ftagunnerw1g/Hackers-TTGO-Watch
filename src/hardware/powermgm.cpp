@@ -85,7 +85,8 @@ void powermgm_loop( void ) {
     /*
      * check if power button was release
      */
-    if( powermgm_get_event( POWERMGM_POWER_BUTTON ) ) {
+    if( powermgm_get_event( POWERMGM_POWER_BUTTON ) ) 
+    {
         if ( powermgm_get_event( POWERMGM_STANDBY | POWERMGM_SILENCE_WAKEUP ) ) {
             powermgm_set_event( POWERMGM_WAKEUP_REQUEST );
         }
@@ -239,7 +240,8 @@ void powermgm_loop( void ) {
                 }
             #endif
         }
-        else {
+        else 
+        {
             log_i("go standby blocked");
             /*
              * set cpu speed

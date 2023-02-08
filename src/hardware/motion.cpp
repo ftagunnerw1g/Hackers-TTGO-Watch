@@ -30,7 +30,7 @@
 #ifdef NATIVE_64BIT
     #include "utils/logging.h"
 
-    static uint32_t stepcounter_valid;                      /** @brief stepcount valid mask, if 0xa5a5a5a5 when stepcounter is valid after reset */
+    static uint32_t stepcounter_valid;                      /** @brief stepcount valid mask, if 0xdead5afe when stepcounter is valid after reset */
     static uint32_t stepcounter_before_reset;               /** @brief stepcounter before reset */
     static uint32_t stepcounter;                            /** @brief stepcounter */
 #else
@@ -59,7 +59,7 @@
     /**
      * move internal stepcounter into noninit ram section
      */
-    __NOINIT_ATTR uint32_t stepcounter_valid;               /** @brief stepcount valid mask, if 0xa5a5a5a5 when stepcounter is valid after reset */
+    __NOINIT_ATTR uint32_t stepcounter_valid;               /** @brief stepcount valid mask, if 0xdead5afe when stepcounter is valid after reset */
     __NOINIT_ATTR uint32_t stepcounter_before_reset;        /** @brief stepcounter before reset */
     __NOINIT_ATTR uint32_t stepcounter;                     /** @brief stepcounter */
 
@@ -103,20 +103,20 @@ void bma_setup( void ) {
             stepcounter = 0;        
         #elif defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V2 ) || defined( LILYGO_WATCH_2020_V3 )
             TTGOClass *ttgo = TTGOClass::getWatch();
-            if ( stepcounter_valid != 0xa5a5a5a5 ) {
+            if ( stepcounter_valid != 0xdead5afe ) {
+                log_i("stepcounter not valid. reset (found prev %d)", stepcounter);
                 stepcounter = 0;
                 stepcounter_before_reset = 0;
-                stepcounter_valid = 0xa5a5a5a5;
+                stepcounter_valid = 0xdead5afe;
                 bma_send_event_cb( BMACTL_STEPCOUNTER_RESET, NULL );
-                log_i("stepcounter not valid. reset");
             }
             stepcounter = stepcounter + stepcounter_before_reset;
         #elif defined( LILYGO_WATCH_2021 )
 /*
-            if ( stepcounter_valid != 0xa5a5a5a5 ) {
+            if ( stepcounter_valid != 0xdead5afe ) {
                 stepcounter = 0;
                 stepcounter_before_reset = 0;
-                stepcounter_valid = 0xa5a5a5a5;
+                stepcounter_valid = 0xdead5afe;
                 bma_send_event_cb( BMACTL_STEPCOUNTER_RESET, NULL );
                 log_i("stepcounter not valid. reset");
             }
@@ -323,6 +323,7 @@ void bma_notify_stepcounter( void ) {
 //            stepcounter_before_reset = bma->getCounter();
         #endif
     #endif
+    stepcounter_valid = 0xdead5afe;
     val = stepcounter + stepcounter_before_reset;
     bma_send_event_cb( BMACTL_STEPCOUNTER, &val );
 }

@@ -36,13 +36,11 @@ bool wifictl_config_t::onSave(JsonDocument& doc) {
      * save config structure into json file
      */
     doc["autoon"] = autoon;
-    if(hostname)
-    {
-      doc["hostname"] = hostname;
-    }
+    doc["hostname"] = hostname;
     doc["webserver"] = webserver;
 
     doc["enable_on_standby"] = enable_on_standby;
+
     for ( int i = 0 ; i < NETWORKLIST_ENTRYS ; i++ ) {
         doc["networklist"][ i ]["ssid"] = networklist[ i ].ssid;
         doc["networklist"][ i ]["psk"] = networklist[ i ].password;
@@ -90,7 +88,9 @@ bool wifictl_config_t::onLoad(JsonDocument& doc) {
     webserver = doc["webserver"] | false;
 
     for ( int i = 0 ; i < NETWORKLIST_ENTRYS ; i++ ) {
-        if ( doc["networklist"][ i ]["ssid"] && doc["networklist"][ i ]["psk"] ) {
+        
+        if ( doc["networklist"][ i ]["ssid"] && doc["networklist"][ i ]["psk"] ) 
+        {
             strncpy( networklist[ i ].ssid    , doc["networklist"][ i ]["ssid"], sizeof( networklist[ i ].ssid ) );
             strncpy( networklist[ i ].password, doc["networklist"][ i ]["psk"], sizeof( networklist[ i ].password ) );
         }

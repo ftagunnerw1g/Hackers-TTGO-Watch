@@ -98,23 +98,23 @@ void note_tile_setup( void ) {
     style = ws_get_mainbar_style();
 
     lv_style_copy( &notestyle, style);
-    lv_style_set_text_opa( &notestyle, LV_OBJ_PART_MAIN, LV_OPA_30);
+    lv_style_set_text_opa( &notestyle, LV_OBJ_PART_MAIN, LV_OPA_40);
     lv_style_set_text_font( &notestyle, LV_STATE_DEFAULT, &LCD_48px);
 
     lv_style_copy( &biglabelstyle, style);
-    lv_style_set_text_opa( &biglabelstyle, LV_OBJ_PART_MAIN, LV_OPA_80);
+    lv_style_set_text_opa( &biglabelstyle, LV_OBJ_PART_MAIN, LV_OPA_90);
     lv_style_set_text_font( &biglabelstyle, LV_STATE_DEFAULT, &LCD_48px);
 
     lv_style_copy( &mediumlabelstyle, style);
-    lv_style_set_text_opa( &mediumlabelstyle, LV_OBJ_PART_MAIN, LV_OPA_80);
+    lv_style_set_text_opa( &mediumlabelstyle, LV_OBJ_PART_MAIN, LV_OPA_90);
     lv_style_set_text_font( &mediumlabelstyle, LV_STATE_DEFAULT, &LCD_32px);
 
     lv_style_copy( &smalllabelstyle, style);
-    lv_style_set_text_opa( &smalllabelstyle, LV_OBJ_PART_MAIN, LV_OPA_80);
+    lv_style_set_text_opa( &smalllabelstyle, LV_OBJ_PART_MAIN, LV_OPA_90);
     lv_style_set_text_font( &smalllabelstyle, LV_STATE_DEFAULT, &LCD_16px);
 
     lv_style_copy( &notestyle, style);
-    lv_style_set_text_opa( &notestyle, LV_OBJ_PART_MAIN, LV_OPA_30);
+    lv_style_set_text_opa( &notestyle, LV_OBJ_PART_MAIN, LV_OPA_40);
     lv_style_set_text_font( &notestyle, LV_STATE_DEFAULT, &LCD_48px);
 
     notelabel = lv_label_create( note_cont, NULL);
@@ -124,11 +124,11 @@ void note_tile_setup( void ) {
     lv_obj_align( notelabel, NULL, LV_ALIGN_IN_TOP_MID, 0, (STATUSBAR_HEIGHT + 12));
 
     lv_style_copy( &weathstyle, style);
-    lv_style_set_text_opa( &weathstyle, LV_OBJ_PART_MAIN, LV_OPA_30);
+    lv_style_set_text_opa( &weathstyle, LV_OBJ_PART_MAIN, LV_OPA_40);
     lv_style_set_text_font( &weathstyle, LV_STATE_DEFAULT, &weather_72px);
 
     lv_style_copy( &miniweathstyle, style);
-    lv_style_set_text_opa( &miniweathstyle, LV_OBJ_PART_MAIN, LV_OPA_30);
+    lv_style_set_text_opa( &miniweathstyle, LV_OBJ_PART_MAIN, LV_OPA_40);
     lv_style_set_text_font( &miniweathstyle, LV_STATE_DEFAULT, &weather_48px);
 
     weathlabel0 = lv_label_create( note_cont, NULL);

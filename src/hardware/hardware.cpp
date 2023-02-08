@@ -193,7 +193,7 @@ void hardware_setup( void ) {
     /**
      * driver init
      */
-#ifdef LILYGO_HAS_SDCARD
+#ifdef LILYGO_WATCH_HAS_SDCARD
     sdcard_setup();
 #endif
     powermgm_setup();

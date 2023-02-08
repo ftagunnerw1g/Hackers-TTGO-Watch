@@ -42,7 +42,6 @@ lv_obj_t *label;
 
 int held = 0;
 
-static lv_style_t *style;
 static lv_style_t labelstyle;
 lv_style_t bluebox_app_main_style;
 

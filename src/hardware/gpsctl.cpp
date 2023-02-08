@@ -62,11 +62,13 @@ bool gpsctl_send_cb( EventBits_t event, void *arg );
 void gpsctl_autoon_on( void );
 void gpsctl_autoon_off( void );
 
-void gpsctl_setup( void ) {
+void gpsctl_setup( void ) 
+{
     /*
      * check if gpsctl already init
      */
-    if ( gpsctl_init ) {
+    if ( gpsctl_init ) 
+    {
         return;
     }
     /*
@@ -407,8 +409,10 @@ void gpsctl_autoon_on( void ) {
     gps_data.satellite_types.glonass_satellites = 0;
     gps_data.satellite_types.baidou_satellites = 0;
 
-    if ( gpsctl_config.autoon ) {
-        if ( !gpsctl_enable ) {
+    if ( gpsctl_config.autoon ) 
+    {
+        if ( !gpsctl_enable ) 
+        {
             #ifdef NATIVE_64BIT
             #else
                 #if defined( M5PAPER )

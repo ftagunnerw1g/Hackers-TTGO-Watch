@@ -84,7 +84,8 @@ bool touch_powermgm_loop_event_cb( EventBits_t event, void *arg );
 bool touch_powermgm_event_cb( EventBits_t event, void *arg );
 bool touch_send_event_cb( EventBits_t event, void *arg );
 
-void touch_setup( void ) {
+void touch_setup( void ) 
+{
 #ifdef NATIVE_64BIT
     /**
      * init SDL mouse
@@ -93,7 +94,7 @@ void touch_setup( void ) {
 #else
     #if defined( M5PAPER )
         /**
-         * rotate toucscreen
+         * rotate touchscreen
          */
         M5.TP.SetRotation(90);
     #elif defined( M5CORE2 )
