@@ -33,294 +33,161 @@
 #include "gui/widget_factory.h"
 #include "gui/widget_styles.h"
 
+#include "utils/alloc.h"
 #include "hardware/sound.h"
+#include "hardware/blectl.h"
 
-lv_obj_t *bluebox_app_main_tile = NULL;
+lv_obj_t *bluebox_app_main_tile;
+lv_obj_t *label; 
+
+int held = 0;
+
+static lv_style_t labelstyle;
 lv_style_t bluebox_app_main_style;
+
+LV_FONT_DECLARE(LCD_32px);
+lv_font_t *label_font = &LCD_32px;
 
 lv_task_t * _bluebox_app_task;
 
-LV_IMG_DECLARE(exit_32px);
-LV_IMG_DECLARE(setup_32px);
-LV_IMG_DECLARE(refresh_32px);
-LV_IMG_DECLARE(keypad_whistle_64px);
-LV_IMG_DECLARE(keypad_0_64px);
-LV_IMG_DECLARE(keypad_1_64px);
-LV_IMG_DECLARE(keypad_2_64px);
-LV_IMG_DECLARE(keypad_3_64px);
-LV_IMG_DECLARE(keypad_4_64px);
-LV_IMG_DECLARE(keypad_5_64px);
-LV_IMG_DECLARE(keypad_6_64px);
-LV_IMG_DECLARE(keypad_7_64px);
-LV_IMG_DECLARE(keypad_8_64px);
-LV_IMG_DECLARE(keypad_9_64px);
-LV_IMG_DECLARE(keypad_star_64px);
-LV_IMG_DECLARE(keypad_hash_64px);
-LV_FONT_DECLARE(Ubuntu_72px);
+char *outsound; 
 
-// buttons
-static void enter_bluebox_app_whistle_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_zero_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_one_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_two_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_three_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_four_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_five_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_six_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_seven_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_eight_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_nine_event_cb( lv_obj_t * obj, lv_event_t event );
-static void enter_bluebox_app_star_event_cb( lv_obj_t * obj, lv_event_t event );      // kp
-static void enter_bluebox_app_hash_event_cb( lv_obj_t * obj, lv_event_t event );      // st
+void sound_mf_task_run(char *str)
+{
+    int x;
+    
+    x = strlen(str) + 1;
+    outsound =  (char *)MALLOC(x);
+    memset(outsound, 0, x);
+    strncpy(outsound,str,strlen(str));
 
-static void exit_bluebox_app_main_event_cb( lv_obj_t * obj, lv_event_t event );
+    xTaskCreate     (   mf_app_task,                                    /* Function to implement the task */
+                        "MF Task",                                      /* Name of the task */
+                        2048,                                           /* Stack size in words */
+            (void *)outsound,                                           /* Task input parameter */
+                           1,                                           /* Priority of the task */
+                        NULL);
+}
 
-void bluebox_app_main_setup( uint32_t tile_num ) {
+void replay_handler(char *str)
+{
+    sound_mf_task_run(str);
+}
 
+void label_update(const char *str)
+{
+    if(!held)
+    {
+        lv_label_set_text(label, str);
+        replay_handler(lv_label_get_text(label));
+        return; 
+    }
+    lv_label_ins_text(label, LV_LABEL_POS_LAST, str); 
+    return; 
+}
+
+static void event_handler(lv_obj_t * obj, lv_event_t event)
+{
+    if(event == LV_EVENT_CLICKED) 
+     {
+        const char * txt = lv_btnmatrix_get_active_btn_text(obj);
+
+        switch(txt[0]) 
+        {
+            case '1':
+                label_update("1");
+                break; 
+            case '2':
+                label_update("2");
+                break; 
+            case '3':
+                label_update("3");
+                break; 
+            case '4':
+                label_update("4");
+                break; 
+            case '5':
+                label_update("5");
+                break; 
+            case '6':
+                label_update("6");
+                break; 
+            case '7':
+                label_update("7");
+                break; 
+            case '8':
+                label_update("8");
+                break; 
+            case '9': 
+                label_update("9");
+                break; 
+            case '0':
+                label_update("0");
+                break; 
+            // KP
+            case 'K':
+                label_update("\\");
+                break;
+            // ST
+            case 'S':
+                label_update("/");
+                break; 
+            // " 2600 "
+            case ' ':
+                label_update("^");
+                break;
+            // Hold
+            case 'H':
+                held = !held;
+                if(held == 0)
+                {
+                    int len = strlen(lv_label_get_text(label)); 
+                    if(len >= 1)
+                        replay_handler(lv_label_get_text(label));    
+                } 
+                //lv_label_set_text(label, "");
+                break; 
+            // Exit
+            case 'E':
+                mainbar_jump_to_maintile( LV_ANIM_OFF );
+                break;
+        }
+    }
+}
+
+static const char * btnm_map[] = {"1", "2", "3", "\n",
+                                  "4", "5", "6", "\n",
+                                  "7", "8", "9", "\n", 
+                                  "KP","0", "ST","\n",
+                                  " 2600 ", "Hold", "\n", 
+                                  "Exit", ""
+                                 };
+
+void bluebox_app_main_setup( uint32_t tile_num ) 
+{
     bluebox_app_main_tile = mainbar_get_tile_obj( tile_num );
     lv_style_copy( &bluebox_app_main_style, APP_STYLE );
 
-    // whistle
-    lv_obj_t * whistle_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(whistle_btn, LV_BTN_STATE_RELEASED, &keypad_whistle_64px);
-    lv_imgbtn_set_src(whistle_btn, LV_BTN_STATE_PRESSED, &keypad_whistle_64px);
-    lv_imgbtn_set_src(whistle_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_whistle_64px);
-    lv_imgbtn_set_src(whistle_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_whistle_64px);
-    lv_obj_add_style(whistle_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(whistle_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 192, 0 );
-    lv_obj_set_event_cb( whistle_btn, enter_bluebox_app_whistle_event_cb );
- 
-    // 0
-    lv_obj_t * zero_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(zero_btn, LV_BTN_STATE_RELEASED, &keypad_0_64px);
-    lv_imgbtn_set_src(zero_btn, LV_BTN_STATE_PRESSED, &keypad_0_64px);
-    lv_imgbtn_set_src(zero_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_0_64px);
-    lv_imgbtn_set_src(zero_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_0_64px);
-    lv_obj_add_style(zero_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(zero_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 64, 192 );
-    lv_obj_set_event_cb( zero_btn, enter_bluebox_app_zero_event_cb );
- 
-    // 1
-    lv_obj_t * one_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(one_btn, LV_BTN_STATE_RELEASED, &keypad_1_64px);
-    lv_imgbtn_set_src(one_btn, LV_BTN_STATE_PRESSED, &keypad_1_64px);
-    lv_imgbtn_set_src(one_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_1_64px);
-    lv_imgbtn_set_src(one_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_1_64px);
-    lv_obj_add_style(one_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(one_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 0, 0 );
-    lv_obj_set_event_cb( one_btn, enter_bluebox_app_one_event_cb );
+    lv_style_copy( &labelstyle, ws_get_mainbar_style());
+    lv_style_set_text_font( &labelstyle, LV_STATE_DEFAULT, label_font );
+    lv_style_set_outline_width(&labelstyle, LV_STATE_DEFAULT, 2);
+    lv_style_set_outline_color(&labelstyle, LV_STATE_DEFAULT, LV_COLOR_BLUE);
+    lv_style_set_outline_pad(&labelstyle, LV_STATE_DEFAULT, 8);
 
-    // 2
-    lv_obj_t * two_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(two_btn, LV_BTN_STATE_RELEASED, &keypad_2_64px);
-    lv_imgbtn_set_src(two_btn, LV_BTN_STATE_PRESSED, &keypad_2_64px);
-    lv_imgbtn_set_src(two_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_2_64px);
-    lv_imgbtn_set_src(two_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_2_64px);
-    lv_obj_add_style(two_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(two_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 64, 0 );
-    lv_obj_set_event_cb( two_btn, enter_bluebox_app_two_event_cb );
+    label = lv_label_create(bluebox_app_main_tile, NULL);
+    lv_obj_align(label, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 10, 15);
+    lv_obj_add_style( label, LV_OBJ_PART_MAIN, &labelstyle ); 
+    lv_label_set_long_mode(label, LV_LABEL_LONG_CROP);
+    lv_obj_set_width(label, 220);
+    lv_label_set_text(label, "");
+    //lv_label_set_text(label, "READY");
 
-    // 3 
-    lv_obj_t * three_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(three_btn, LV_BTN_STATE_RELEASED, &keypad_3_64px);
-    lv_imgbtn_set_src(three_btn, LV_BTN_STATE_PRESSED, &keypad_3_64px);
-    lv_imgbtn_set_src(three_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_3_64px);
-    lv_imgbtn_set_src(three_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_3_64px);
-    lv_obj_add_style(three_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(three_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 128, 0 );
-    lv_obj_set_event_cb( three_btn, enter_bluebox_app_three_event_cb );
-
-    // 4 
-    lv_obj_t * four_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(four_btn, LV_BTN_STATE_RELEASED, &keypad_4_64px);
-    lv_imgbtn_set_src(four_btn, LV_BTN_STATE_PRESSED, &keypad_4_64px);
-    lv_imgbtn_set_src(four_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_4_64px);
-    lv_imgbtn_set_src(four_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_4_64px);
-    lv_obj_add_style(four_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(four_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 0, 64 );
-    lv_obj_set_event_cb( four_btn, enter_bluebox_app_four_event_cb );
-
-    // 5 
-    lv_obj_t * five_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(five_btn, LV_BTN_STATE_RELEASED, &keypad_5_64px);
-    lv_imgbtn_set_src(five_btn, LV_BTN_STATE_PRESSED, &keypad_5_64px);
-    lv_imgbtn_set_src(five_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_5_64px);
-    lv_imgbtn_set_src(five_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_5_64px);
-    lv_obj_add_style(five_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(five_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 64, 64 );
-    lv_obj_set_event_cb( five_btn, enter_bluebox_app_five_event_cb );
- 
-    // 6
-    lv_obj_t * six_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(six_btn, LV_BTN_STATE_RELEASED, &keypad_6_64px);
-    lv_imgbtn_set_src(six_btn, LV_BTN_STATE_PRESSED, &keypad_6_64px);
-    lv_imgbtn_set_src(six_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_6_64px);
-    lv_imgbtn_set_src(six_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_6_64px);
-    lv_obj_add_style(six_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(six_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 128, 64 );
-    lv_obj_set_event_cb( six_btn, enter_bluebox_app_six_event_cb );
-
-    // 7 
-    lv_obj_t * seven_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(seven_btn, LV_BTN_STATE_RELEASED, &keypad_7_64px);
-    lv_imgbtn_set_src(seven_btn, LV_BTN_STATE_PRESSED, &keypad_7_64px);
-    lv_imgbtn_set_src(seven_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_7_64px);
-    lv_imgbtn_set_src(seven_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_7_64px);
-    lv_obj_add_style(seven_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(seven_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 0, 128 );
-    lv_obj_set_event_cb( seven_btn, enter_bluebox_app_seven_event_cb );
- 
-    // 8
-    lv_obj_t * eight_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(eight_btn, LV_BTN_STATE_RELEASED, &keypad_8_64px);
-    lv_imgbtn_set_src(eight_btn, LV_BTN_STATE_PRESSED, &keypad_8_64px);
-    lv_imgbtn_set_src(eight_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_8_64px);
-    lv_imgbtn_set_src(eight_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_8_64px);
-    lv_obj_add_style(eight_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(eight_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 64, 128 );
-    lv_obj_set_event_cb( eight_btn, enter_bluebox_app_eight_event_cb );
-
-    // 9 
-    lv_obj_t * nine_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(nine_btn, LV_BTN_STATE_RELEASED, &keypad_9_64px);
-    lv_imgbtn_set_src(nine_btn, LV_BTN_STATE_PRESSED, &keypad_9_64px);
-    lv_imgbtn_set_src(nine_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_9_64px);
-    lv_imgbtn_set_src(nine_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_9_64px);
-    lv_obj_add_style(nine_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(nine_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 128, 128 );
-    lv_obj_set_event_cb( nine_btn, enter_bluebox_app_nine_event_cb );
-
-    // star 
-    lv_obj_t * star_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(star_btn, LV_BTN_STATE_RELEASED, &keypad_star_64px);
-    lv_imgbtn_set_src(star_btn, LV_BTN_STATE_PRESSED, &keypad_star_64px);
-    lv_imgbtn_set_src(star_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_star_64px);
-    lv_imgbtn_set_src(star_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_star_64px);
-    lv_obj_add_style(star_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(star_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 0, 192 );
-    lv_obj_set_event_cb( star_btn, enter_bluebox_app_star_event_cb );
- 
-    // hash
-    lv_obj_t * hash_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(hash_btn, LV_BTN_STATE_RELEASED, &keypad_hash_64px);
-    lv_imgbtn_set_src(hash_btn, LV_BTN_STATE_PRESSED, &keypad_hash_64px);
-    lv_imgbtn_set_src(hash_btn, LV_BTN_STATE_CHECKED_RELEASED, &keypad_hash_64px);
-    lv_imgbtn_set_src(hash_btn, LV_BTN_STATE_CHECKED_PRESSED, &keypad_hash_64px);
-    lv_obj_add_style(hash_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(hash_btn, bluebox_app_main_tile, LV_ALIGN_IN_TOP_LEFT, 128, 192 );
-    lv_obj_set_event_cb( hash_btn, enter_bluebox_app_hash_event_cb );
- 
-    lv_obj_t * exit_btn = lv_imgbtn_create( bluebox_app_main_tile, NULL);
-    lv_imgbtn_set_src(exit_btn, LV_BTN_STATE_RELEASED, &exit_32px);
-    lv_imgbtn_set_src(exit_btn, LV_BTN_STATE_PRESSED, &exit_32px);
-    lv_imgbtn_set_src(exit_btn, LV_BTN_STATE_CHECKED_RELEASED, &exit_32px);
-    lv_imgbtn_set_src(exit_btn, LV_BTN_STATE_CHECKED_PRESSED, &exit_32px);
-    lv_obj_add_style(exit_btn, LV_IMGBTN_PART_MAIN, &bluebox_app_main_style );
-    lv_obj_align(exit_btn, bluebox_app_main_tile, LV_ALIGN_IN_BOTTOM_RIGHT, -10, -10 );
-    lv_obj_set_event_cb( exit_btn, exit_bluebox_app_main_event_cb );
-}
-
-void play_out(const char *filename)
-{
-    sound_play_spiffs_mp3(filename);
-}
-
-static void enter_bluebox_app_whistle_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/2600.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_zero_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/0.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_one_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/1.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_two_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/2.mp3" ); 
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_three_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/3.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_four_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/4.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_five_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):     play_out( "/5.mp3" );
-                                      break;
-    }
-}
-
-static void enter_bluebox_app_six_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):     play_out( "/6.mp3" );
-                                      break;
-    }
-}
-
-static void enter_bluebox_app_seven_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/7.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_eight_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/8.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_nine_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):      play_out( "/9.mp3" );
-                                       break;
-    }
-}
-
-static void enter_bluebox_app_star_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       play_out( "/ST.mp3" );
-                                        break;
-    }
-}
-
-static void enter_bluebox_app_hash_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       play_out( "/KP.mp3" );
-                                        break;
-    }
-}
-
-static void exit_bluebox_app_main_event_cb( lv_obj_t * obj, lv_event_t event ) {
-    switch( event ) {
-        case( LV_EVENT_CLICKED ):       mainbar_jump_to_maintile( LV_ANIM_OFF );
-                                        break;
-    }
+    lv_obj_t * btnm1 = lv_btnmatrix_create(bluebox_app_main_tile, NULL);
+    lv_btnmatrix_set_map(btnm1, btnm_map);
+    lv_btnmatrix_set_btn_ctrl(btnm1, 13, LV_BTNMATRIX_CTRL_CHECKABLE);
+    lv_obj_set_size(btnm1, 240,185);
+    lv_obj_align(btnm1, NULL, LV_ALIGN_IN_BOTTOM_MID, 0, 0);
+    lv_obj_set_event_cb(btnm1, event_handler);
 }
 
 

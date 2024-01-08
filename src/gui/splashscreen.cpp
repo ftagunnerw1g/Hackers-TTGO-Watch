@@ -75,11 +75,11 @@ void splash_screen_stage_one( void ) {
         lv_img_set_src( logo, &hedgehog );
     }
     lv_obj_align( logo, NULL, LV_ALIGN_CENTER, 0, 0 );
-    lv_obj_add_style( logo, LV_OBJ_PART_MAIN, SYSTEM_ICON_STYLE );
+    //lv_obj_add_style( logo, LV_OBJ_PART_MAIN, SYSTEM_ICON_STYLE );
 
     preload = lv_bar_create( lv_scr_act(), NULL );
     lv_obj_set_size( preload, lv_disp_get_hor_res( NULL ) - 80, 20 );
-    lv_obj_add_style( preload, LV_OBJ_PART_MAIN, SYSTEM_ICON_STYLE );
+    //lv_obj_add_style( preload, LV_OBJ_PART_MAIN, SYSTEM_ICON_STYLE );
     lv_obj_align( preload, logo, LV_ALIGN_OUT_BOTTOM_MID, 0, 30 );
     lv_bar_set_anim_time( preload, 2000);
     lv_bar_set_value( preload, 0, LV_ANIM_ON);
@@ -104,12 +104,12 @@ void splash_screen_stage_one( void ) {
             TTGOClass *ttgo = TTGOClass::getWatch();
             for( int bl = 0 ; bl < display_get_brightness() ; bl++ ) {
                 ttgo->bl->adjust( bl );
-                delay(5);
+                delay(15);
             }   
         #elif defined( LILYGO_WATCH_2021 )   
             for( int bl = 0 ; bl < display_get_brightness() ; bl++ ) {
                 ledcWrite(0, bl );
-                delay(5);
+                delay(15);
             }            
         #endif
     #endif
@@ -136,12 +136,12 @@ void splash_screen_stage_finish( void ) {
 
             for( int bl = display_get_brightness() ; bl >= 0 ; bl-- ) {
                 ttgo->bl->adjust( bl );
-                delay(5);
+                delay(15);
             }
         #elif defined( LILYGO_WATCH_2021 )   
             for( int bl = display_get_brightness() ; bl >= 0 ; bl-- ) {
                 ledcWrite(0, bl );
-                delay(5);
+                delay(15);
             }   
         #endif
     #endif

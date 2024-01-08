@@ -37,6 +37,7 @@
         bool timesync = true;                               /** @brief time sync on/off */
         bool daylightsave = false;                          /** @brief day light save on/off */
         int32_t timezone = 0;                               /** @brief time zone from 0..24, 0 means -12 */
+        int32_t synchour = 2;                               /** @brief hour to background NTP sync at */
         bool use_24hr_clock = true;                         /** @brief 12h/24h time format */
         char timezone_name[32] = TIMEZONE_NAME_DEFAULT;     /** @brief name of the time zone to use */
         char timezone_rule[48] = TIMEZONE_RULE_DEFAULT;     /** @brief time zone rule to use */

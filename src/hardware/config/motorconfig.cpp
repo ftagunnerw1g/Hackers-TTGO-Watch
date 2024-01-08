@@ -31,7 +31,7 @@ bool motor_config_t::onSave(JsonDocument& doc) {
 }
 
 bool motor_config_t::onLoad(JsonDocument& doc) {
-    vibe = doc["motor"].as<bool>();
+    vibe = doc["motor"].as<bool>() | false;
 
     return true;
 }

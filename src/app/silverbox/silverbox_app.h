@@ -1,9 +1,3 @@
-/****************************************************************************
- *   Oct 05 23:05:42 2020
- *   Copyright  2020  Dirk Brosswick
- *   Email: dirk.brosswick@googlemail.com
- ****************************************************************************/
- 
 /*
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -19,12 +13,11 @@
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
  */
-#ifndef _BLUETOOTH_MEDIA_H
-    #define _BLUETOOTH_MEDIA_H
+#ifndef _SILVERBOX_APP_H
+    #define _SILVERBOX_APP_H
 
-    /**
-     * @brief setup bluetooth media control tile
-     */
-    void bluetooth_media_tile_setup( void );
+    #include <TTGO.h>
 
-#endif // _BLUETOOTH_MEDIA_H
+    void silverbox_app_setup( void );
+    uint32_t silverbox_app_get_app_main_tile_num( void );
+#endif // _SILVERBOX_APP_H

@@ -63,13 +63,13 @@ void fetch_ip_info( void ) {
     char asn[128];
     int httpcode = -1;
     lv_obj_t * label;
-    
+
     snprintf( url, sizeof( url ), "http://ip-api.com/json/%s", lv_textarea_get_text(iplookup_ip_textfield));
     log_i("request for %s", url);
 
     HTTPClient today_client;
 
-    today_client.begin( url );
+    today_client.begin(url);
     httpcode = today_client.GET();
 
     if ( httpcode != 200 ) {

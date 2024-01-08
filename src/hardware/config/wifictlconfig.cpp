@@ -40,6 +40,7 @@ bool wifictl_config_t::onSave(JsonDocument& doc) {
     doc["webserver"] = webserver;
 
     doc["enable_on_standby"] = enable_on_standby;
+
     for ( int i = 0 ; i < NETWORKLIST_ENTRYS ; i++ ) {
         doc["networklist"][ i ]["ssid"] = networklist[ i ].ssid;
         doc["networklist"][ i ]["psk"] = networklist[ i ].password;
@@ -49,13 +50,15 @@ bool wifictl_config_t::onSave(JsonDocument& doc) {
 }
 
 bool wifictl_config_t::onLoad(JsonDocument& doc) {
+    log_i("wifictl onLoad"); 
+
     /*
      * allocate networklist if needed
      */
     if ( networklist == NULL ) {
         networklist = ( wifictl_networklist* )CALLOC( sizeof( wifictl_networklist ) * NETWORKLIST_ENTRYS, 1 );
         if( !networklist ) {
-            log_e("wifictl_networklist calloc faild");
+            log_e("wifictl_networklist calloc failed");
             while(true);
         }
     }
@@ -85,7 +88,9 @@ bool wifictl_config_t::onLoad(JsonDocument& doc) {
     webserver = doc["webserver"] | false;
 
     for ( int i = 0 ; i < NETWORKLIST_ENTRYS ; i++ ) {
-        if ( doc["networklist"][ i ]["ssid"] && doc["networklist"][ i ]["psk"] ) {
+        
+        if ( doc["networklist"][ i ]["ssid"] && doc["networklist"][ i ]["psk"] ) 
+        {
             strncpy( networklist[ i ].ssid    , doc["networklist"][ i ]["ssid"], sizeof( networklist[ i ].ssid ) );
             strncpy( networklist[ i ].password, doc["networklist"][ i ]["psk"], sizeof( networklist[ i ].password ) );
         }
@@ -98,10 +103,13 @@ bool wifictl_config_t::onDefault( void ) {
     /*
      * allocate networklist if needed
      */
+
+    log_i("wifictl onDefault");
+
     if ( networklist == NULL ) {
         networklist = ( wifictl_networklist* )CALLOC( sizeof( wifictl_networklist ) * NETWORKLIST_ENTRYS, 1 );
         if( !networklist ) {
-            log_e("wifictl_networklist calloc faild");
+            log_e("wifictl_networklist calloc failed");
             while(true);
         }
     }

@@ -29,7 +29,6 @@ bool display_config_t::onSave(JsonDocument& doc) {
     doc["rotation"] = rotation;
     doc["timeout"] = timeout;
     doc["block_return_maintile"] = block_return_maintile;
-    doc["background_image"] = background_image;
     doc["use_dma"] = use_dma;
     doc["use_double_buffering"] = use_double_buffering;
     doc["vibe"] = vibe;
@@ -42,10 +41,9 @@ bool display_config_t::onLoad(JsonDocument& doc) {
     rotation = doc["rotation"] | DISPLAY_MIN_ROTATE;
     timeout = doc["timeout"] | DISPLAY_MIN_TIMEOUT;
     block_return_maintile = doc["block_return_maintile"] | false;
-    background_image = doc["background_image"] | 4;
     use_dma = doc["use_dma"] | true;
     use_double_buffering = doc["use_double_buffering"] | false;
-    vibe = doc["vibe"] | true;
+    vibe = doc["vibe"] | false;
 
     return true;
 }

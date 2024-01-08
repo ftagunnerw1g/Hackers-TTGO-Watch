@@ -23,8 +23,6 @@
 #include "bluetooth_settings.h"
 #include "bluetooth_pairing.h"
 #include "bluetooth_call.h"
-#include "bluetooth_message.h"
-#include "bluetooth_media.h"
 
 #include "gui/mainbar/mainbar.h"
 #include "gui/mainbar/setup_tile/setup_tile.h"
@@ -45,7 +43,6 @@ uint32_t bluetooth_tile_num_2;
 lv_obj_t *bluetooth_enable_onoff = NULL;
 lv_obj_t *bluetooth_standby_onoff = NULL;
 lv_obj_t *bluetooth_stayon_onoff = NULL;
-lv_obj_t *bluetooth_advertising_onoff = NULL;
 lv_obj_t *bluetooth_show_notifications_onoff = NULL;
 lv_obj_t *txpower_list = NULL;
 
@@ -61,7 +58,6 @@ bool blectl_onoff_event_cb( EventBits_t event, void *arg );
 static void bluetooth_enable_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void bluetooth_standby_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void bluetooth_stayon_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
-static void bluetooth_advertising_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void bluetooth_show_notifications_onoff_event_handler(lv_obj_t * obj, lv_event_t event);
 static void bluetooth_txpower_event_handler(lv_obj_t * obj, lv_event_t event);
 
@@ -101,11 +97,8 @@ void bluetooth_settings_tile_setup( void ) {
     lv_obj_t *bluetooth_enable_cont = wf_add_labeled_switch( bluetooth_settings_tile_1, "enable on wakeup", &bluetooth_enable_onoff, blectl_get_autoon(), bluetooth_enable_onoff_event_handler, SETUP_STYLE );
     lv_obj_align( bluetooth_enable_cont, header, LV_ALIGN_OUT_BOTTOM_MID, 0, THEME_PADDING );
 
-    lv_obj_t *bluetooth_advertising_cont = wf_add_labeled_switch( bluetooth_settings_tile_1, "visibility", &bluetooth_advertising_onoff, blectl_get_advertising(), bluetooth_advertising_onoff_event_handler, SETUP_STYLE );
-    lv_obj_align( bluetooth_advertising_cont, bluetooth_enable_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, THEME_PADDING );
-    
     lv_obj_t *bluetooth_standby_cont = wf_add_labeled_switch( bluetooth_settings_tile_1, "always on", &bluetooth_standby_onoff, blectl_get_enable_on_standby(), bluetooth_standby_onoff_event_handler, SETUP_STYLE );
-    lv_obj_align( bluetooth_standby_cont, bluetooth_advertising_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, THEME_PADDING );
+    lv_obj_align( bluetooth_standby_cont, bluetooth_enable_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, THEME_PADDING );
 
     lv_obj_t *bluetooth_stayon_cont = wf_add_labeled_switch( bluetooth_settings_tile_1, "stay on", &bluetooth_stayon_onoff, blectl_get_disable_only_disconnected(), bluetooth_stayon_onoff_event_handler, SETUP_STYLE );
     lv_obj_align( bluetooth_stayon_cont, bluetooth_standby_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, THEME_PADDING );
@@ -126,8 +119,6 @@ void bluetooth_settings_tile_setup( void ) {
 
     bluetooth_pairing_tile_setup();
     bluetooth_call_tile_setup();
-    bluetooth_message_tile_setup();
-    bluetooth_media_tile_setup();
 
     blectl_register_cb( BLECTL_ON | BLECTL_OFF, blectl_onoff_event_cb, "bluetooth settings");
 }
@@ -179,12 +170,6 @@ static void bluetooth_enable_onoff_event_handler(lv_obj_t * obj, lv_event_t even
     }
 }
 
-
-static void bluetooth_advertising_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
-    switch( event ) {
-        case ( LV_EVENT_VALUE_CHANGED): blectl_set_advertising( lv_switch_get_state( obj ) );
-    }
-}
 
 static void bluetooth_standby_onoff_event_handler(lv_obj_t * obj, lv_event_t event) {
     switch( event ) {

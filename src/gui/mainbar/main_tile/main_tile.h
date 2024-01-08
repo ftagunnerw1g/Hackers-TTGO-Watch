@@ -46,6 +46,12 @@
      * @brief align all enabled widgets
      */
     void main_tile_align_widgets( void );
+
+    // show / hide stopwatch
+    void main_tile_show_stopwatch( void );
+    void main_tile_hide_stopwatch( void );
+    void main_tile_update_stopwatch( int stop_min, int stop_sec, int stop_ms );
+
     /**
      * @brief get an free widget icon structure
      * 

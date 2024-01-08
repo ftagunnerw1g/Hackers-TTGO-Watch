@@ -69,15 +69,15 @@ static void enter_stopwatch_app_event_cb( lv_obj_t * obj, lv_event_t event ) {
 }
 
 void stopwatch_add_widget( void ) {
-    stopwatch_widget = widget_register( "stopwatch", &stopwatch_app_64px, enter_stopwatch_app_event_cb );
+    // stopwatch_widget = widget_register( "stopwatch", &stopwatch_app_64px, enter_stopwatch_app_event_cb );
 }
 
 void stopwatch_remove_widget( void ) {
-    stopwatch_widget = widget_remove( stopwatch_widget );
+    // stopwatch_widget = widget_remove( stopwatch_widget );
 }
 
 void stopwatch_app_update_widget_label( char *label ) {
-    widget_set_label( stopwatch_widget, label );
+    // widget_set_label( stopwatch_widget, label );
 }
 
 void stopwatch_app_hide_app_icon_info( bool show ) {
@@ -91,9 +91,9 @@ void stopwatch_app_hide_app_icon_info( bool show ) {
 
 void stopwatch_app_hide_widget_icon_info( bool show ) {
     if ( !show ) {
-        widget_set_indicator( stopwatch_widget, ICON_INDICATOR_1 );
+       // widget_set_indicator( stopwatch_widget, ICON_INDICATOR_1 );
     }
     else {
-        widget_hide_indicator( stopwatch_widget );
+       // widget_hide_indicator( stopwatch_widget );
     }
 }

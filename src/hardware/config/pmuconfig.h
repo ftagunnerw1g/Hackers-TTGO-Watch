@@ -30,7 +30,7 @@
      * Some default values, used below as well as in pmu.cpp during json reads
      */
     #define SILENCEWAKEINTERVAL             20                  /** @brief defines the silence wakeup interval in minutes */
-    #define SILENCEWAKEINTERVAL_PLUG        5                   /** @brief defines the silence wakeup interval in minutes when plugged*/
+    #define SILENCEWAKEINTERVAL_PLUG        20                  /** @brief defines the silence wakeup interval in minutes when plugged*/
     #define NORMALVOLTAGE                   3300                /** @brief defines the norminal voltages while working */
     #define NORMALPOWERSAVEVOLTAGE          3000                /** @brief defines the norminal voltages while in powersave */
     #define EXPERIMENTALNORMALVOLTAGE       3000                /** @brief defines the norminal voltages while working with exprimental powersave enabled */

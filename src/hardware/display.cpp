@@ -201,7 +201,7 @@ void display_standby( void ) {
             brightness = 0;
             dest_brightness = 0;
             #if defined( LILYGO_WATCH_2020_V2 )
-                ttgo->power->setLDO2Voltage( 3300 );
+                ttgo->power->setLDO2Voltage( 3300 );                      // XXX why? 
                 ttgo->power->setLDO3Voltage( 3300 );
                 ttgo->power->setPowerOutPut( AXP202_LDO2, false );
                 ttgo->power->setPowerOutPut( AXP202_LDO3, false );
@@ -354,14 +354,6 @@ void display_set_rotation( uint32_t rotation ) {
     #endif
     display_config.rotation = rotation;
     lv_obj_invalidate( lv_scr_act() );
-}
-
-uint32_t display_get_background_image( void ) {
-    return( display_config.background_image );
-}
-
-void display_set_background_image( uint32_t background_image ) {
-    display_config.background_image = background_image;
 }
 
 void display_set_vibe( bool vibe ) {

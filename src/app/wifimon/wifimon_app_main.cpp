@@ -101,27 +101,34 @@ static void wifimon_channel_select_event_handler( lv_obj_t * obj, lv_event_t eve
         case LV_EVENT_VALUE_CHANGED: {
             char buf[32];
             lv_roller_get_selected_str( obj, buf, sizeof( buf ) );
+            lv_chart_set_x_start_point(chart, ser1, 0);
+            lv_chart_set_x_start_point(chart, ser2, 0);
+            lv_chart_set_x_start_point(chart, ser3, 0);
             wifimon_sniffer_set_channel( atoi(buf) );
             break;
         }
     }
 }
 
-void wifimon_app_main_setup( uint32_t tile_num ) {
-
+void wifimon_app_main_setup( uint32_t tile_num ) 
+{
     wifimon_app_main_tile = mainbar_get_tile_obj( tile_num );
     /**
      * add chart widget
      */
     chart = lv_chart_create( wifimon_app_main_tile, NULL );
-    lv_obj_set_size( chart, lv_disp_get_hor_res( NULL ), lv_disp_get_ver_res( NULL ) - THEME_ICON_SIZE );
-    lv_obj_align( chart, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 0 );
+    lv_obj_set_size( chart, lv_disp_get_hor_res( NULL ) - 50, lv_disp_get_ver_res( NULL ) - (THEME_ICON_SIZE - 3));
+    lv_obj_align( chart, NULL, LV_ALIGN_IN_TOP_LEFT, 50, 3 );
     lv_chart_set_type( chart, LV_CHART_TYPE_LINE );  
     lv_chart_set_point_count( chart, 32 );
+    lv_chart_set_div_line_count(chart, 0, 0);
+    lv_obj_set_style_local_size(chart, LV_CHART_PART_SERIES, LV_STATE_DEFAULT, 1);             // hide the ugly dots
+    lv_obj_set_style_local_bg_opa( chart, LV_CHART_PART_BG, LV_STATE_DEFAULT, LV_OPA_10 );
+    lv_obj_set_style_local_bg_opa( chart, LV_CHART_PART_SERIES_BG, LV_STATE_DEFAULT, LV_OPA_10 );
     lv_obj_set_style_local_bg_opa( chart, LV_CHART_PART_SERIES, LV_STATE_DEFAULT, LV_OPA_50 );
     lv_obj_set_style_local_bg_grad_dir( chart, LV_CHART_PART_SERIES, LV_STATE_DEFAULT, LV_GRAD_DIR_VER );
     lv_obj_set_style_local_bg_main_stop( chart, LV_CHART_PART_SERIES, LV_STATE_DEFAULT, 255 );
-    lv_obj_set_style_local_bg_grad_stop( chart, LV_CHART_PART_SERIES, LV_STATE_DEFAULT, 0 );
+    lv_obj_set_style_local_bg_grad_stop( chart, LV_CHART_PART_SERIES, LV_STATE_DEFAULT, 128 );
     /**
      * add chart series
      */
@@ -137,8 +144,9 @@ void wifimon_app_main_setup( uint32_t tile_num ) {
      * add channel select roller
      */
     channel_select = lv_roller_create(wifimon_app_main_tile, NULL);
+    lv_obj_set_style_local_bg_opa( channel_select, LV_ROLLER_PART_BG, LV_STATE_DEFAULT, LV_OPA_50 );
     lv_roller_set_options( channel_select, "1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13", LV_ROLLER_MODE_INIFINITE );
-    lv_roller_set_visible_row_count( channel_select, 5 );
+    lv_roller_set_visible_row_count(channel_select, 5);
     lv_obj_align( channel_select, NULL, LV_ALIGN_IN_TOP_LEFT, THEME_ICON_PADDING, THEME_ICON_PADDING );
     lv_obj_set_event_cb( channel_select, wifimon_channel_select_event_handler );
     /**
@@ -148,9 +156,9 @@ void wifimon_app_main_setup( uint32_t tile_num ) {
     lv_label_set_long_mode( chart_series_label, LV_LABEL_LONG_BREAK );
     lv_label_set_recolor( chart_series_label, true );
     lv_label_set_align( chart_series_label, LV_LABEL_ALIGN_RIGHT );       
-    lv_label_set_text( chart_series_label, "#ffff00 - misc#\n#ff0000 - mgmt#\n#11ff00 - data#"); 
-    lv_obj_set_width( chart_series_label, 70 );
-    lv_obj_align( chart_series_label, NULL, LV_ALIGN_IN_TOP_RIGHT, -THEME_ICON_PADDING, THEME_ICON_PADDING );
+    lv_label_set_text( chart_series_label, "#ff0000 mgmt# #ffff00 misc# #11ff00 data#"); 
+    lv_obj_set_width( chart_series_label, 200 );
+    lv_obj_align( chart_series_label, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -1, -10);
 
     mainbar_add_tile_activate_cb( tile_num, wifimon_activate_cb );
     mainbar_add_tile_hibernate_cb( tile_num, wifimon_hibernate_cb );
@@ -204,7 +212,7 @@ static void wifimon_activate_cb( void ) {
     /**
      * start stats fetch task
      */
-    _wifimon_app_task = lv_task_create( wifimon_app_task, 1000, LV_TASK_PRIO_MID, NULL );
+    _wifimon_app_task = lv_task_create( wifimon_app_task, 500, LV_TASK_PRIO_MID, NULL );
     /**
      * save display timeout time
      */

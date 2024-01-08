@@ -26,10 +26,10 @@
 
     #define DISPLAY_JSON_CONFIG_FILE    "/display.json" /** @brief defines json config file name */
     
-    #define DISPLAY_MIN_TIMEOUT         15              /** @brief min display timeout */
-    #define DISPLAY_MAX_TIMEOUT         300             /** @brief max display timeout */
+    #define DISPLAY_MIN_TIMEOUT         10              /** @brief min display timeout */
+    #define DISPLAY_MAX_TIMEOUT         150             /** @brief max display timeout */
     #define DISPLAY_MIN_BRIGHTNESS      8               /** @brief min display brightness */
-    #define DISPLAY_MAX_BRIGHTNESS      64              /** @brief max display brightness */
+    #define DISPLAY_MAX_BRIGHTNESS      30              /** @brief max display brightness */
     #define DISPLAY_MIN_ROTATE          0               /** @brief min display rotation */
     #define DISPLAY_MAX_ROTATE          270             /** @brief max display rotation */
 
@@ -45,8 +45,7 @@
         bool block_return_maintile = false;             /** @brief block back to main tile on standby */
         bool use_dma = true;                            /** @brief use dma framebuffer */
         bool use_double_buffering = false;              /** @brief use double framebuffer */
-        bool vibe = true;                               /** @brief vibe for touch feedback */
-        uint32_t background_image = 4;                  /** @brief background image */
+        bool vibe = false;                              /** @brief vibe for touch feedback */
 
         protected:
         ////////////// Available for overloading: //////////////

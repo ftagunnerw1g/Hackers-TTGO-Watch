@@ -25,7 +25,6 @@
 #include "osmmap_app_main.h"
 #include "app/osmmap/config/osmmap_config.h"
 
-#include "gui/mainbar/setup_tile/bluetooth_settings/bluetooth_message.h"
 #include "gui/mainbar/app_tile/app_tile.h"
 #include "gui/mainbar/main_tile/main_tile.h"
 #include "gui/mainbar/mainbar.h"
@@ -151,7 +150,9 @@ void osmmap_app_main_setup( uint32_t tile_num ) {
     /**
      * load config
      */
+    log_i("loading config..");
     osmmap_config.load();
+    log_i("loaded config..");
     osmmap_location = osm_map_create_location_obj();
     osmmap_location->load_ahead = osmmap_config.load_ahead;
 #if defined( M5PAPER )
@@ -379,18 +380,18 @@ static void osmmap_app_get_setting_menu_cb( lv_obj_t * obj, lv_event_t event ) {
                 osmmap_config.save();
             }
             else if ( !strcmp( lv_list_get_btn_text( obj ), "autostart gps" ) ) {
-                osmmap_config.gps_autoon = !osmmap_config.gps_autoon;
-                gpsctl_set_autoon( osmmap_config.gps_autoon );
+                //osmmap_config.gps_autoon = !osmmap_config.gps_autoon;
+                //gpsctl_set_autoon( osmmap_config.gps_autoon );
                 osmmap_config.save();
             }
             else if ( !strcmp( lv_list_get_btn_text( obj ), "gps on standby" ) ) {
-                osmmap_config.gps_on_standby = !osmmap_config.gps_on_standby;
-                gpsctl_set_enable_on_standby( osmmap_config.gps_on_standby );
+                //osmmap_config.gps_on_standby = !osmmap_config.gps_on_standby;
+                //gpsctl_set_enable_on_standby( osmmap_config.gps_on_standby );
                 osmmap_config.save();
             }
             else if ( !strcmp( lv_list_get_btn_text( obj ), "autostart wifi" ) ) {
-                osmmap_config.wifi_autoon = !osmmap_config.wifi_autoon;
-                wifictl_set_autoon( osmmap_config.load_ahead );
+                //osmmap_config.wifi_autoon = !osmmap_config.wifi_autoon;
+                //wifictl_set_autoon( osmmap_config.load_ahead );
                 osmmap_config.save();
             }
             else if ( !strcmp( lv_list_get_btn_text( obj ), "left/right hand" ) ) {
@@ -821,25 +822,25 @@ void osmmap_activate_cb( void ) {
     /**
      * save block show messages state
      */
-    osmmap_gps_state = gpsctl_get_autoon();
-    if( osmmap_config.gps_autoon ) {
-        gpsctl_on();
-    }
+    //osmmap_gps_state = gpsctl_get_autoon();
+    //if( osmmap_config.gps_autoon ) {
+    //    gpsctl_on();
+    //}
     /**
      * save block show messages state
      */
-    osmmap_wifi_state = wifictl_get_autoon();
-    if( osmmap_config.wifi_autoon ) {
-        wifictl_on();
-        wifictl_set_autoon( osmmap_config.wifi_autoon );
-    }
+    //osmmap_wifi_state = wifictl_get_autoon();
+    //if( osmmap_config.wifi_autoon ) {
+    //    wifictl_on();
+    //    wifictl_set_autoon( osmmap_config.wifi_autoon );
+    //}
     /**
      * save block show messages state
      */
-    osmmap_gps_on_standby_state = gpsctl_get_enable_on_standby();
-    if ( osmmap_config.gps_on_standby ) {
-        gpsctl_set_enable_on_standby( true );
-    }
+    //osmmap_gps_on_standby_state = gpsctl_get_enable_on_standby();
+    //if ( osmmap_config.gps_on_standby ) {
+    //    gpsctl_set_enable_on_standby( true );
+    //}
     /**
      * save block show messages state
      */
@@ -852,8 +853,8 @@ void osmmap_activate_cb( void ) {
     /**
      * save block show messages state
      */
-    osmmap_block_show_messages = blectl_get_show_notification();
-    blectl_set_show_notification( false );
+    //osmmap_block_show_messages = blectl_get_show_notification();
+    //blectl_set_show_notification( false );
     /**
      * save black return to maintile state
      */
@@ -877,14 +878,14 @@ void osmmap_activate_cb( void ) {
     xEventGroupClearBits( osmmap_event_handle, OSM_APP_TASK_EXIT_REQUEST );
     xTaskCreate(    osmmap_update_Task,      /* Function to implement the task */
                     "osmmap update Task",    /* Name of the task */
-                    5000,                            /* Stack size in words */
+                    8192,                            /* Stack size in words */
                     NULL,                            /* Task input parameter */
                     1,                               /* Priority of the task */
                     &_osmmap_update_Task );  /* Task handle. */
 
     xTaskCreate(    osmmap_load_ahead_Task,      /* Function to implement the task */
                     "osmmap load ahead Task",    /* Name of the task */
-                    5000,                            /* Stack size in words */
+                    8192,                            /* Stack size in words */
                     NULL,                            /* Task input parameter */
                     1,                               /* Priority of the task */
                     &_osmmap_load_ahead_Task );  /* Task handle. */
@@ -898,11 +899,11 @@ void osmmap_hibernate_cb( void ) {
     /**
      * restore back to maintile and status force dark mode
      */
-    blectl_set_show_notification( osmmap_block_show_messages );
+    //blectl_set_show_notification( osmmap_block_show_messages );
     display_set_block_return_maintile( osmmap_block_return_maintile );
-    gpsctl_set_autoon( osmmap_gps_state );
-    wifictl_set_autoon( osmmap_wifi_state );
-    gpsctl_set_enable_on_standby( osmmap_gps_on_standby_state );
+    //gpsctl_set_autoon( osmmap_gps_state );
+    //wifictl_set_autoon( osmmap_wifi_state );
+    //gpsctl_set_enable_on_standby( osmmap_gps_on_standby_state );
 #ifdef NATIVE_64BIT
 
 #else
@@ -928,5 +929,5 @@ void osmmap_hibernate_cb( void ) {
     /**
      * save config
      */
-    osmmap_config.save();
+    //osmmap_config.save();
 }

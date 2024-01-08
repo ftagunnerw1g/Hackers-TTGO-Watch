@@ -112,6 +112,10 @@
         int32_t msglen;                 /** @brief msg lenght */
         int32_t msgpos;                 /** @brief msg postition for next send */
     } blectl_msg_t;
+
+    void blectl_bluetooth_keyboard(void); 
+    void blectl_bluetooth_sendkeys(void); 
+
     /**
      * @brief ble setup function
      */

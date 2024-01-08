@@ -7,7 +7,7 @@
 ![ping](images/ping.png?raw=true "ping")
 ![portscan](images/portscan.png?raw=true "portscan")
 
-An alternative software distribution for the TTGO smartwatch based on ESP32 from LilyGo. Currently under active development (check back often for new functionality) 
+An alternative software distribution for the TTGO smartwatch based on ESP32 from LilyGo. Under active development (new release expected 7th Jan 2023) 
 
 Forked from the excellent software by sharandac https://github.com/sharandac/My-TTGO-Watch with some small fixes and different apps. 
 
@@ -30,12 +30,6 @@ pio run -t upload
 
 or simple press "build and upload" in platformIO.
 
-The first time you may wish to add bluebox mp3 files with:
-
-```    
-pio run -t uploadfs     
-```    
-
 # known issues
 
 * the battery indicator is not accurate, rather a problem with the power management unit ( axp202 )    
@@ -53,7 +47,7 @@ pio run -t uploadfs
 # Apps    
 
 ## New:-    
-*Bluebox*     - bluebox for the phreaks (add the included mp3 files to SPIFFS using `pio run -t uploadfs` the first time)     
+*Bluebox*     - bluebox for the phreaks  
 *Netscan*     - Simple connect() based port scanner (slow with unreachable/blocked hosts - is there a better way working for ESP32?)    
 *Subnet*      - Simple subnet calculator to see how many hosts / valid hosts    
 *Ping*        - Ping some IP address     

@@ -57,7 +57,7 @@ void timesync_setup( void ) {
         */
         time_event_handle = xEventGroupCreate();
         /*
-        * register wigi, ble and powermgm callback function
+        * register wifi, ble and powermgm callback function
         */
         wifictl_register_cb( WIFICTL_CONNECT, timesync_wifictl_event_cb, "wifictl timesync" );
         blectl_register_cb( BLECTL_MSG, timesync_blectl_event_cb, "blectl timesync" );
@@ -102,12 +102,19 @@ bool timesync_powermgm_event_cb( EventBits_t event, void *arg ) {
             /*
              * only update rtc time when an NTP timesync was success
              */
-            if ( xEventGroupGetBits( time_event_handle ) & TIME_SYNC_OK ) {
+            if ( xEventGroupGetBits( time_event_handle ) & TIME_SYNC_OK ) 
+            {
                 timesyncToRTC();
                 xEventGroupClearBits( time_event_handle, TIME_SYNC_OK );
                 log_i("NTP sync success - updating RTC");
+                if(timesync_config.synchour == 99)
+                {
+                    timesync_config.synchour = 2;
+                }
+
             }
-            else {
+            else 
+            {
                 log_i("go standby");
             }
 #endif
@@ -130,12 +137,24 @@ bool timesync_powermgm_event_cb( EventBits_t event, void *arg ) {
 
 bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
 #ifndef NATIVE_64BIT
+    time_t now;
+    struct tm info;
+    /*
+    * copy current time into now and convert it local time info
+    */
+    time( &now );
+    localtime_r( &now, &info );
+
+    int h = info.tm_hour;
+    int m = info.tm_min;
+
     switch ( event ) {
         case WIFICTL_CONNECT:
             /*
              * sync time when autosync is enabled
              */ 
-            if ( timesync_config.timesync ) {
+            if ( timesync_config.timesync ) 
+            {
                 /*
                  * check if another sync request is running
                  */
@@ -143,16 +162,25 @@ bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
                     break;
                 }
                 else {
-                    /*
-                     * start timesync task
-                     */
-                    xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
-                    xTaskCreate(    timesync_Task,       /* Function to implement the task */
-                                    "timesync Task",     /* Name of the task */
-                                    2000,                /* Stack size in words */
-                                    NULL,                /* Task input parameter */
-                                    1,                   /* Priority of the task */
-                                    &_timesync_Task );   /* Task handle. */
+		/*
+		 *  start timesync task if we're at sync hour
+                 *  also if we are on first run or within a minute of startup 
+		 */
+                    if(((h == timesync_config.synchour) && (m < 30)) || (timesync_config.synchour == 99) || millis() < 45000)
+                    {
+                        log_i("performing ntp sync");
+		        xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
+		        xTaskCreate(    timesync_Task,       /* Function to implement the task */
+		    	    	        "timesync Task",     /* Name of the task */
+				        2000,                /* Stack size in words */
+				        NULL,                /* Task input parameter */
+				        1,                   /* Priority of the task */
+				        &_timesync_Task );   /* Task handle. */
+                    }
+                    else
+                    {
+                        log_i("next ntp sync is scheduled during hour %d", timesync_config.synchour); 
+                    }
                 }
             }
             break;
@@ -168,10 +196,12 @@ bool timesync_blectl_event_cb( EventBits_t event, void *arg ) {
     struct timeval new_now;
 
 #ifndef NATIVE_64BIT
-    switch( event ) {
+    switch( event ) 
+    {
         case BLECTL_MSG:
             settime_str = strstr( (const char*)arg, "setTime(" );
-            if ( settime_str ) {
+            if ( settime_str ) 
+            {
                 settime_str = settime_str + 8;
                 time( &now );
                 log_i("old time: %d", now );
@@ -344,6 +374,32 @@ void timesync_get_current_timestring( char * buf, size_t buf_len ) {
         if (h > 12) h -= 12;
         snprintf( buf, buf_len, "%d:%02d", h, m );
     }
+}
+
+void timesync_get_current_secsstring( char * buf, size_t buf_len ) {
+    time_t now;
+    struct tm info;
+    /*
+    * copy current time into now and convert it local time info
+    */
+    time( &now );
+    localtime_r( &now, &info );
+
+    int s = info.tm_sec; 
+
+    snprintf( buf, buf_len, "%02d", s );
+}
+
+int timesync_get_seconds( void ) {
+    time_t now;
+    struct tm info;
+    /*
+    * copy current time into now and convert it local time info
+    */
+    time( &now );
+    localtime_r( &now, &info );
+
+    return (int)info.tm_sec; 
 }
 
 void timesync_get_current_datestring( char * buf, size_t buf_len ) {

@@ -32,7 +32,6 @@
 #include "hardware/blectl.h"
 #include "hardware/rtcctl.h"
 #include "hardware/sound.h"
-#include "gui/mainbar/setup_tile/bluetooth_settings/bluetooth_message.h"
 #include "time.h"
 
 static double time_hour;
@@ -68,9 +67,6 @@ extern "C" {
     double get_battery_voltage(void) {
         return pmu_get_battery_voltage() / 1000;
     }
-    double get_bluetooth_nb_msg(void) {
-        return bluetooth_get_number_of_msg();
-    }
     double get_stepcounter(void) {
         return bma_get_stepcounter();
     }
@@ -85,7 +81,6 @@ te_variable watchface_expr_vars[] = {
     {"wifi", &wifi},
     {"battery_percent", (const void*)get_battery_percent, TE_FUNCTION0},
     {"battery_voltage", (const void*)get_battery_voltage, TE_FUNCTION0},
-    {"bluetooth_messages", (const void*)get_bluetooth_nb_msg, TE_FUNCTION0},
     {"steps", (const void*)get_stepcounter, TE_FUNCTION0},
     {"time_hour", &time_hour},
     {"time_min", &time_min},

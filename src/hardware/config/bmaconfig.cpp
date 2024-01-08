@@ -22,8 +22,10 @@
 #include "bmaconfig.h"
 
 bma_config_t::bma_config_t() : BaseJsonConfig(BMA_JSON_COFIG_FILE) {
-    for (int i = 0 ; i < BMA_CONFIG_NUM ; i++)
-        enable[i]=true;
+        enable[BMA_STEPCOUNTER]=true;
+        enable[BMA_DOUBLECLICK]=false;
+        enable[BMA_TILT]=false;
+        enable[BMA_DAILY_STEPCOUNTER]=true;
 }
 
 bool bma_config_t::onSave(JsonDocument& doc) {
@@ -37,9 +39,9 @@ bool bma_config_t::onSave(JsonDocument& doc) {
 
 bool bma_config_t::onLoad(JsonDocument& doc) {
     enable[ BMA_STEPCOUNTER ] = doc["stepcounter"] | true;
-    enable[ BMA_DOUBLECLICK ] = doc["doubleclick"] | true;
+    enable[ BMA_DOUBLECLICK ] = doc["doubleclick"] | false;
     enable[ BMA_TILT ] = doc["tilt"] | false;
-    enable[ BMA_DAILY_STEPCOUNTER ] = doc["daily_stepcounter"] | false;
+    enable[ BMA_DAILY_STEPCOUNTER ] = doc["daily_stepcounter"] | true;
   
     return true;
 }

@@ -138,6 +138,18 @@
      */
     void timesync_get_current_timestring( char * buf, size_t buf_len );
     /**
+     * @brief get the right formated time string seconds
+     * 
+     * @param buf pointer to an string buffer
+     * @param buf_len size of the string buffer
+     */
+    void timesync_get_current_secsstring( char * buf, size_t buf_len );
+    /**
+     * @brief get the seconds
+     * 
+     */
+    int timesync_get_seconds( void );
+    /**
      * @brief get the right formated date string
      * 
      * @param buf pointer to an string buffer

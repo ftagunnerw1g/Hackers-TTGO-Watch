@@ -61,11 +61,11 @@ void battery_settings_tile_setup( void ) {
     battery_settings_tile_num = mainbar_add_setup_tile( 1, 1, "battery setup" );
     battery_settings_tile = mainbar_get_tile_obj( battery_settings_tile_num );
 
-//     battery_view_tile_setup( battery_settings_tile_num );
+    battery_view_tile_setup( battery_settings_tile_num );
 
     battery_setup_icon = setup_register( "battery", &battery_icon_64px, enter_battery_setup_event_cb );
     setup_hide_indicator( battery_setup_icon );
-
+/*
     lv_obj_t *header = wf_add_settings_header( battery_settings_tile, "energy settings", exit_battery_setup_event_cb );
     lv_obj_align( header, battery_settings_tile, LV_ALIGN_IN_TOP_LEFT, 10, STATUSBAR_HEIGHT + 10 );
 
@@ -85,6 +85,7 @@ void battery_settings_tile_setup( void ) {
     lv_obj_align( battery_high_voltage_switch_cont, battery_experimental_switch_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 2 );
 
     battery_set_experimental_indicator();
+*/
 }
 
 void battery_set_experimental_indicator( void ) {

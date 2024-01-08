@@ -63,11 +63,16 @@ void sdcard_setup( void ) {
              */
             heap_caps_malloc_extmem_enable( 1 );
             if (!sdhander) {
+                log_i("starting SD handler");
                 sdhander = new SPIClass(HSPI);
                 sdhander->begin(SD_SCLK, SD_MISO, SD_MOSI, SD_CS);
             }
             if (!SD.begin(SD_CS, *sdhander)) {
                 log_e("SD Card Mount Failed");
+            }
+            else
+            {
+                log_i("SD card mount");
             }
             heap_caps_malloc_extmem_enable( 16 * 1024 );
         #endif    

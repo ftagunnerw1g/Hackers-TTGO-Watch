@@ -58,34 +58,8 @@ void sdcard_settings_tile_setup(void)
     icon_t *utilities_setup_icon = setup_register("SD card", &sdcard_settings_64px, enter_sdcard_settings_event_cb);
     setup_hide_indicator(utilities_setup_icon);
 
-    lv_obj_t *header = wf_add_settings_header( sdcard_settings_tile, "SD card setup", exit_sdcard_setup_event_cb );
+    lv_obj_t *header = wf_add_settings_header( sdcard_settings_tile, "SD card", exit_sdcard_setup_event_cb );
     lv_obj_align(header, sdcard_settings_tile, LV_ALIGN_IN_TOP_LEFT, 10, STATUSBAR_HEIGHT + 10);
-
-    lv_obj_t *sd_infos_cont = lv_obj_create(sdcard_settings_tile, NULL);
-    lv_obj_set_size(sd_infos_cont, lv_disp_get_hor_res(NULL), 15);
-    lv_obj_add_style(sd_infos_cont, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_obj_t *sd_infos_label = lv_label_create(sd_infos_cont, NULL);
-    lv_obj_add_style(sd_infos_label, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_label_set_text(sd_infos_label, "SD information");
-    lv_obj_align(sd_infos_label, sd_infos_cont, LV_ALIGN_IN_LEFT_MID, 15, 0);
-
-    lv_obj_t *sd_type_cont = lv_obj_create(sdcard_settings_tile, NULL);
-    lv_obj_set_size(sd_type_cont, lv_disp_get_hor_res(NULL), 15);
-    lv_obj_add_style(sd_type_cont, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_obj_align(sd_type_cont, sd_infos_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 4);
-    lv_obj_t *sd_type_label = lv_label_create(sd_type_cont, NULL);
-    lv_obj_add_style(sd_type_label, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_label_set_text(sd_type_label, "SD card type:");
-    lv_obj_align(sd_type_label, sd_type_cont, LV_ALIGN_IN_LEFT_MID, 15, 0);
-
-    lv_obj_t *sd_size_cont = lv_obj_create(sdcard_settings_tile, NULL);
-    lv_obj_set_size(sd_size_cont, lv_disp_get_hor_res(NULL), 15);
-    lv_obj_add_style(sd_size_cont, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_obj_align(sd_size_cont, sd_type_cont, LV_ALIGN_OUT_BOTTOM_MID, 0, 4);
-    lv_obj_t *sd_size_label = lv_label_create(sd_size_cont, NULL);
-    lv_obj_add_style(sd_size_label, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_label_set_text(sd_size_label, "SD card size:");
-    lv_obj_align(sd_size_label, sd_size_cont, LV_ALIGN_IN_LEFT_MID, 15, 0);
 
 #ifdef LILYGO_WATCH_HAS_SDCARD
     //get SD type
@@ -108,19 +82,19 @@ void sdcard_settings_tile_setup(void)
     default:
         sdCardType = "UNKNOWN";
     }
-    lv_obj_t *sd_type_val = lv_label_create(sd_type_cont, NULL);
+    lv_obj_t *sd_type_val = lv_label_create(sdcard_settings_tile, NULL);
     lv_obj_add_style(sd_type_val, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_label_set_text(sd_type_val, sdCardType.c_str());
-    lv_obj_align(sd_type_val, sd_type_cont, LV_ALIGN_IN_RIGHT_MID, -5, 0);
+    lv_label_set_text_fmt(sd_type_val, "SD Type: %s", sdCardType.c_str());
+    lv_obj_align(sd_type_val, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 80);
 
     //get SD size
     uint64_t cardSize = SD.cardSize() / (1024 * 1024);
     char sdCardSize[25]; //enough to hold all numbers up to 64-bits
     sprintf(sdCardSize, "%lluMB\n", cardSize);
-    lv_obj_t *sd_size_val = lv_label_create(sd_size_cont, NULL);
+    lv_obj_t *sd_size_val = lv_label_create(sdcard_settings_tile, NULL);
     lv_obj_add_style(sd_size_val, LV_OBJ_PART_MAIN, &sdcard_settings_style);
-    lv_label_set_text(sd_size_val, sdCardSize);
-    lv_obj_align(sd_size_val, sd_size_cont, LV_ALIGN_IN_RIGHT_MID, -5, 8);
+    lv_label_set_text_fmt(sd_size_val, "SD Size: %s", sdCardSize);
+    lv_obj_align(sd_size_val, NULL, LV_ALIGN_IN_TOP_LEFT, 0, 120);
 #endif
 
 }

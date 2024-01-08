@@ -85,7 +85,8 @@ void powermgm_loop( void ) {
     /*
      * check if power button was release
      */
-    if( powermgm_get_event( POWERMGM_POWER_BUTTON ) ) {
+    if( powermgm_get_event( POWERMGM_POWER_BUTTON ) ) 
+    {
         if ( powermgm_get_event( POWERMGM_STANDBY | POWERMGM_SILENCE_WAKEUP ) ) {
             powermgm_set_event( POWERMGM_WAKEUP_REQUEST );
         }
@@ -157,11 +158,11 @@ void powermgm_loop( void ) {
              *          will be used.
              */
             #if CONFIG_PM_ENABLE
-                pm_config.max_freq_mhz = 240;
+                pm_config.max_freq_mhz = 160; // 240;
                 pm_config.min_freq_mhz = 80;
                 pm_config.light_sleep_enable = false;
                 ESP_ERROR_CHECK( esp_pm_configure(&pm_config) );
-                log_i("custom arduino-esp32 framework detected, enable PM/DFS support, 240/80MHz with light sleep");
+                log_i("custom arduino-esp32 framework detected, enable PM/DFS support, 160/80MHz with light sleep");
             #else
                 #ifndef NATIVE_64BIT
                     setCpuFrequencyMhz(240);
@@ -216,17 +217,16 @@ void powermgm_loop( void ) {
             #ifdef NATIVE_64BIT
 
             #else
+                log_i("CPU 80MHz");
+                // delay usually prevents sleep before we've got all output etc
+                delay(500);
                 setCpuFrequencyMhz( 80 );
-                log_i("CPU speed = 80MHz, start light sleep");
 
-                // delay prevents sleep before we've got all output etc
-                delay(50);
-
-                /*
-                * from here, the consumption is round about 2.5mA
-                * total standby time is 152h (6days) without use?
-                */
+                esp_sleep_enable_timer_wakeup( 20 * 60 * 1000000 );
                 esp_light_sleep_start();
+
+                // XXX wake up here 
+               
                 /**
                  * check wakeup source
                  */
@@ -236,11 +236,13 @@ void powermgm_loop( void ) {
                         powermgm_set_event( POWERMGM_SILENCE_WAKEUP_REQUEST );
                         break;
                     default:
+			log_i("button wakeup");
                         break;
                 }
             #endif
         }
-        else {
+        else 
+        {
             log_i("go standby blocked");
             /*
              * set cpu speed
@@ -280,6 +282,7 @@ void powermgm_loop( void ) {
                     * from here, the consumption is round about 20mA with ble
                     * total standby time is 15h with a 350mAh battery
                    */
+
                     log_i("custom arduino-esp32 framework detected, enable PM/DFS support, 80/40MHz with light sleep");
                     pm_config.max_freq_mhz = 80;
                     pm_config.min_freq_mhz = 40;
@@ -347,7 +350,7 @@ void powermgm_set_perf_mode( void ) {
     #endif
 }
 
-void powermgm_set_normal_mode( void ) {
+void powermgm_set_boost_mode( void ) {
     #if CONFIG_PM_ENABLE
         pm_config.max_freq_mhz = 240;
         pm_config.min_freq_mhz = 80;
@@ -356,6 +359,32 @@ void powermgm_set_normal_mode( void ) {
     #else
         #ifndef NATIVE_64BIT
             setCpuFrequencyMhz(240);
+        #endif
+    #endif
+}
+
+void powermgm_set_normal_mode( void ) {
+    #if CONFIG_PM_ENABLE
+        pm_config.max_freq_mhz = 160;
+        pm_config.min_freq_mhz = 80;
+        pm_config.light_sleep_enable = false;
+        ESP_ERROR_CHECK( esp_pm_configure(&pm_config) );
+    #else
+        #ifndef NATIVE_64BIT
+            setCpuFrequencyMhz(160);
+        #endif
+    #endif
+}
+
+void powermgm_set_eco_mode( void ) {
+    #if CONFIG_PM_ENABLE
+        pm_config.max_freq_mhz = 80;
+        pm_config.min_freq_mhz = 80;
+        pm_config.light_sleep_enable = false;
+        ESP_ERROR_CHECK( esp_pm_configure(&pm_config) );
+    #else
+        #ifndef NATIVE_64BIT
+            setCpuFrequencyMhz(80);
         #endif
     #endif
 }
