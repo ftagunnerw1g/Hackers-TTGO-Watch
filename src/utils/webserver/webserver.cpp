@@ -174,7 +174,7 @@ void asyncwebserver_start(void){
   asyncserver.on("/shot", HTTP_GET, [](AsyncWebServerRequest * request) {
     String html = (String) "<html><head><meta charset=\"utf-8\"><body><h3>Screenshot</h3>" + 
                            "<b>Screenshot: </b> Captured <br><br>" +
-                           "<a href=screen.data download>Result</a> Retrieve the image in RGB565 format (open it with GIMP)<br>" + 
+                           "<a href=screen.png download>Result</a><br>" + 
                            "</body></head></html>";
     log_i("screenshot requested");
     screenshot_take();

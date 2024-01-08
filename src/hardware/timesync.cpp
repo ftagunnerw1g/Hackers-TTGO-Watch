@@ -166,9 +166,9 @@ bool timesync_wifictl_event_cb( EventBits_t event, void *arg ) {
 		 *  start timesync task if we're at sync hour
                  *  also if we are on first run or within a minute of startup 
 		 */
-                    if(((h == timesync_config.synchour) && (m < 30)) || (timesync_config.synchour == 99) || millis() < 60000)
+                    if(((h == timesync_config.synchour) && (m < 30)) || (timesync_config.synchour == 99) || millis() < 45000)
                     {
-                        log_i("performing ntp sync as hour now %d", timesync_config.synchour);
+                        log_i("performing ntp sync");
 		        xEventGroupSetBits( time_event_handle, TIME_SYNC_REQUEST );
 		        xTaskCreate(    timesync_Task,       /* Function to implement the task */
 		    	    	        "timesync Task",     /* Name of the task */
