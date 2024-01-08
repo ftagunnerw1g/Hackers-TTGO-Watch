@@ -236,6 +236,7 @@ void powermgm_loop( void ) {
                         powermgm_set_event( POWERMGM_SILENCE_WAKEUP_REQUEST );
                         break;
                     default:
+			log_i("button wakeup");
                         break;
                 }
             #endif

@@ -97,6 +97,7 @@ void note_tile_setup( void ) {
     #endif 
     style = ws_get_mainbar_style();
 
+    #if defined( WATCH_DEBUG_BUILD ) 
     lv_style_copy( &notestyle, style);
     lv_style_set_text_opa( &notestyle, LV_OBJ_PART_MAIN, LV_OPA_40);
     lv_style_set_text_font( &notestyle, LV_STATE_DEFAULT, &LCD_48px);
@@ -202,6 +203,7 @@ void note_tile_setup( void ) {
     lv_obj_reset_style_list( weathlabel3text, LV_OBJ_PART_MAIN );
     lv_obj_add_style( weathlabel3text, LV_OBJ_PART_MAIN, &smalllabelstyle );
     lv_obj_align( weathlabel3text, NULL, LV_ALIGN_IN_BOTTOM_RIGHT, -55, 0);
+    #endif
 
     mainbar_add_tile_button_cb( note_tile_num, note_tile_button_event_cb );
 

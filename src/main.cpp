@@ -60,7 +60,9 @@ void setup() {
     sshclient_app_setup();
     wireless_app_setup();
     wifimon_app_setup();
+#if defined( WATCH_DEBUG_BUILD ) 
     debug_app_setup();
+#endif
     stopwatch_app_setup();
     alarm_clock_setup();
 

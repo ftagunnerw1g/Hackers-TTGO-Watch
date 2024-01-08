@@ -73,11 +73,13 @@ void step_tile_setup( void ) {
     lv_style_set_text_opa( &stepstyle, LV_OBJ_PART_MAIN, LV_OPA_40);
     lv_style_set_text_font( &stepstyle, LV_STATE_DEFAULT, &LCD_48px);
 
+    #if defined( WATCH_DEBUG_BUILD )
     steplabel = lv_label_create( step_cont, NULL);
     lv_label_set_text( steplabel, "123456");
     lv_obj_reset_style_list( steplabel, LV_OBJ_PART_MAIN );
     lv_obj_add_style( steplabel, LV_OBJ_PART_MAIN, &stepstyle );
     lv_obj_align( steplabel, NULL, LV_ALIGN_IN_LEFT_MID, 0, 0);
+    #endif
 
     mainbar_add_tile_button_cb( step_tile_num, step_tile_button_event_cb );
 
