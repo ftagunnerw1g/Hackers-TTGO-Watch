@@ -7,18 +7,9 @@
 ![ping](images/ping.png?raw=true "ping")
 ![portscan](images/portscan.png?raw=true "portscan")
 
-An alternative software distribution for the TTGO smartwatch based on ESP32 from LilyGo. Under active development (new release expected 7th Jan 2023) 
+An alternative software distribution for the TTGO smartwatch based on ESP32 from LilyGo. 
 
 Forked from the excellent software by sharandac https://github.com/sharandac/My-TTGO-Watch with some small fixes and different apps. 
-
-* Changed main font (e.g for the timeface) to FreeMono (TODO: Fix naming. Still appears as 'ubuntu')
-* Removed crypto ticker
-* Removed weather app
-* Removed FTP server (TODO: will try to add SSH server for SCP) 
-* Removed osmand mapping app
-* Removed some of the haptic motor stuff
-* Removed update feature for now (TODO: probably to update over SSH) 
-* Fixed a sound issue with wav/mp3 playback
 
 # Install
 
@@ -38,16 +29,11 @@ or simple press "build and upload" in platformIO.
 * from time to time the esp32 crashes accidentally    
 * and some other small things    
 
-# Improving battery life / stability
-
-* I have found it best for battery and stability to use just the wifi and keep the bluetooth disabled for now     
-* I set a plain black background via the settings which seems to make the screenshot process more stable (still some reboots)    
-* Seems best to disable webserver when not in use    
-
 # Apps    
 
 ## New:-    
 *Bluebox*     - bluebox for the phreaks  
+*Silver box*  - DTMF dialler  
 *Netscan*     - Simple connect() based port scanner (slow with unreachable/blocked hosts - is there a better way working for ESP32?)    
 *Subnet*      - Simple subnet calculator to see how many hosts / valid hosts    
 *Ping*        - Ping some IP address     
