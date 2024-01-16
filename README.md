@@ -29,6 +29,11 @@ or simple press "build and upload" in platformIO.
 * from time to time the esp32 crashes accidentally    
 * and some other small things    
 
+# notes regarding t-watch-2020 v2 (gps model) 
+* gps uses quite a bit of power and is very bad for battery life (under investigation)
+* hardware issue with gps antenna connection can prevent the gps from getting a good fix (fix per https://github.com/Xinyuan-LilyGO/TTGO_TWatch_Library/issues/188)
+* SD card doesn't always make a good connection. can be helped by putting a thin piece of foam packaging material in the area of the SD to press on it slightly 
+
 # Apps    
 
 ## New:-    
