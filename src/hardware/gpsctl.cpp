@@ -128,7 +128,7 @@ void gpsctl_setup( void ) {
                 gps_serial->begin( GPSBaud, SERIAL_8N1, gpsctl_config.RXPin, gpsctl_config.TXPin );
             #endif
 
-            TGC_sats_in_view_gps.begin( gps, "GPGSV", 3);
+	    TGC_sats_in_view_gps.begin( gps, "GPGSV", 3);
             TGC_sats_in_view_glonass.begin( gps, "GLGSV", 3);
             TGC_sats_in_view_baidou.begin( gps, "BDGSV", 3);
         }
@@ -231,7 +231,7 @@ bool gpsctl_powermgm_loop_cb( EventBits_t event, void *arg ) {
                 gps_data.lat = gps.location.lat();
                 gps_data.lon = gps.location.lng();
                 gpsctl_send_cb( GPSCTL_UPDATE_LOCATION, (void*)&gps_data );
-                GPSCTL_DEBUG_LOG("new lat/lon: %f/%f", gps_data.lat, gps_data.lon );
+                log_d("new lat/lon: %f/%f", gps_data.lat, gps_data.lon );
             }
             if ( gps.speed.isUpdated() ) {
                 gps_data.gps_source = GPS_SOURCE_GPS;
@@ -239,27 +239,27 @@ bool gpsctl_powermgm_loop_cb( EventBits_t event, void *arg ) {
                 gps_data.speed_mps = gps.speed.mps();
                 gps_data.speed_kmh = gps.speed.kmph();
                 gpsctl_send_cb( GPSCTL_UPDATE_SPEED, (void*)&gps_data );
-                GPSCTL_DEBUG_LOG("new speed: %fkmh / %fmph / %mps", gps_data.speed_kmh, gps_data.speed_mph, gps_data.speed_mps );
+                log_d("new speed: %fkmh / %fmph / %mps", gps_data.speed_kmh, gps_data.speed_mph, gps_data.speed_mps );
             }
             if ( gps.altitude.isUpdated()) {
                 gps_data.gps_source = GPS_SOURCE_GPS;
                 gps_data.altitude_feed = gps.altitude.feet();
                 gps_data.altitude_meters = gps.altitude.meters();
                 gpsctl_send_cb( GPSCTL_UPDATE_ALTITUDE, (void*)&gps_data );
-                GPSCTL_DEBUG_LOG("new altitude: %fmeters / %ffeed", gps_data.altitude_meters, gps_data.altitude_feed );
+                log_d("new altitude: %fmeters / %ffeed", gps_data.altitude_meters, gps_data.altitude_feed );
             }
             if( gps.course.isUpdated() ) {
                 gps_data.gps_source = GPS_SOURCE_GPS;
                 gps_data.course = gps.course.value();
                 gpsctl_send_cb( GPSCTL_UPDATE_COURSE, (void*)&gps_data );
-                GPSCTL_DEBUG_LOG("new course: %f", gps_data.course );
+                log_d("new course: %f", gps_data.course );
             }
             if ( gps.satellites.isUpdated() ) {
                 if ( gps_data.satellites != gps.satellites.value() ) {
                     gps_data.gps_source = GPS_SOURCE_GPS;
                     gps_data.satellites = gps.satellites.value();
                     gpsctl_send_cb( GPSCTL_UPDATE_SATELLITE, (void*)&gps_data );
-                    GPSCTL_DEBUG_LOG("new satellites: %d", gps_data.satellites );
+                    log_d("new satellites: %d", gps_data.satellites );
                 }
             }
             /*
@@ -271,7 +271,7 @@ bool gpsctl_powermgm_loop_cb( EventBits_t event, void *arg ) {
                     gps_data.gps_source = GPS_SOURCE_GPS;
                     gps_data.satellite_types.gps_satellites = atoi( TGC_sats_in_view_gps.value() );
                     gpsctl_send_cb( GPSCTL_UPDATE_SATELLITE_TYPE, (void *)&gps_data );
-                    GPSCTL_DEBUG_LOG("gps satellites: %d", gps_data.satellite_types.gps_satellites );
+                    log_i("GPS satellites: %d", gps_data.satellite_types.gps_satellites );
                 }
             }
             if ( TGC_sats_in_view_glonass.isUpdated() )
@@ -280,7 +280,7 @@ bool gpsctl_powermgm_loop_cb( EventBits_t event, void *arg ) {
                     gps_data.gps_source = GPS_SOURCE_GPS;
                     gps_data.satellite_types.glonass_satellites = atoi( TGC_sats_in_view_glonass.value() );
                     gpsctl_send_cb( GPSCTL_UPDATE_SATELLITE_TYPE, (void *)&gps_data );
-                    GPSCTL_DEBUG_LOG("glosnass satellites: %d", gps_data.satellite_types.glonass_satellites );
+                    log_i("GLONASS satellites: %d", gps_data.satellite_types.glonass_satellites );
                 }
             }
             if ( TGC_sats_in_view_baidou.isUpdated() )
@@ -289,7 +289,7 @@ bool gpsctl_powermgm_loop_cb( EventBits_t event, void *arg ) {
                     gps_data.gps_source = GPS_SOURCE_GPS;
                     gps_data.satellite_types.baidou_satellites = atoi( TGC_sats_in_view_baidou.value() );
                     gpsctl_send_cb( GPSCTL_UPDATE_SATELLITE_TYPE, (void *)&gps_data );
-                    GPSCTL_DEBUG_LOG("baidou satellites: %d", gps_data.satellite_types.baidou_satellites );
+                    log_i("BeiDou satellites: %d", gps_data.satellite_types.baidou_satellites );
                 }
             }
         #endif // NATIVE_64BIT
@@ -309,7 +309,7 @@ bool gpsctl_powermgm_event_cb( EventBits_t event, void *arg ) {
 
     switch( event ) {
         case POWERMGM_STANDBY:          if ( gpsctl_config.enable_on_standby && gpsctl_enable ) {
-                                            GPSCTL_INFO_LOG("standby blocked by \"enable on standby\" option");
+                                            log_i("standby blocked by GPS \"enable on standby\" option");
                                         }
                                         else {
                                             GPSCTL_INFO_LOG("go standby");
@@ -368,6 +368,7 @@ void gpsctl_on( void ) {
             #elif defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V2 ) || defined( LILYGO_WATCH_2020_V3 )
                 #if defined( LILYGO_WATCH_HAS_GPS )
                     TTGOClass *ttgo = TTGOClass::getWatch();
+		    log_i("Turning on GPS");
                     ttgo->trunOnGPS();
                 #endif
             #endif
@@ -406,6 +407,7 @@ void gpsctl_off( void ) {
             #elif defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V2 ) || defined( LILYGO_WATCH_2020_V3 )
                 #if defined( LILYGO_WATCH_HAS_GPS )
                     TTGOClass *ttgo = TTGOClass::getWatch();
+		    log_i("Turning off GPS");
                     ttgo->turnOffGPS();
                 #endif
             #endif
@@ -451,6 +453,7 @@ void gpsctl_autoon_on( void ) {
                 #elif defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V2 ) || defined( LILYGO_WATCH_2020_V3 )
                     #if defined( LILYGO_WATCH_HAS_GPS )
                         TTGOClass *ttgo = TTGOClass::getWatch();
+			log_i("GPS turning on");
                         ttgo->trunOnGPS();
                     #endif
                 #endif
@@ -461,6 +464,7 @@ void gpsctl_autoon_on( void ) {
         }
     }
     else {
+        log_i("GPS not turning on as autoon is not set");
         gpsctl_enable = false;
         gpsctl_send_cb( GPSCTL_NOFIX, NULL );
         gpsctl_send_cb( GPSCTL_DISABLE, NULL );
@@ -477,6 +481,7 @@ void gpsctl_autoon_off( void ) {
         #elif defined( LILYGO_WATCH_2020_V1 ) || defined( LILYGO_WATCH_2020_V2 ) || defined( LILYGO_WATCH_2020_V3 )
             #if defined( LILYGO_WATCH_HAS_GPS )
                 TTGOClass *ttgo = TTGOClass::getWatch();
+		log_i("GPS is turning off");
                 ttgo->turnOffGPS();
             #endif
         #endif
@@ -522,7 +527,7 @@ void gpsctl_set_gps_rx_tx_pin( int8_t rx, int8_t tx ) {
     gpsctl_config.RXPin = rx;
     gpsctl_config.TXPin = tx;
     gpsctl_config.save();
-    GPSCTL_DEBUG_LOG("set new rx/tx pin %d/%d", rx, tx );
+    log_i("set new rx/tx pin %d/%d", rx, tx );
 }
 
 void gpsctl_get_gps_rx_tx_pin( int8_t *rx, int8_t *tx ) {

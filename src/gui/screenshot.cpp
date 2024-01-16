@@ -77,7 +77,7 @@ void screenshot_take( void ) {
         }
     #endif
 
-    log_i("take screenshot");
+    log_d("take screenshot");
     /**
      * redirect display driver
      */
@@ -110,7 +110,7 @@ void screenshot_save( void ) {
      * open new screenshoot file and write them
      */
     if ( raw_grey ) {
-        log_i("save 8bit grey screenshot");
+        log_d("save 8bit grey screenshot");
         /**
          * save img buffer as png
          */
@@ -122,7 +122,7 @@ void screenshot_save( void ) {
         raw_grey = NULL;
     }
     if ( raw_rgb ) {
-        log_i("save rgba screenshot");
+        log_d("save rgba screenshot");
         /**
          * save img buffer as png
          */

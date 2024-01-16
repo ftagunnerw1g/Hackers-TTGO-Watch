@@ -160,7 +160,7 @@ void osmmap_app_main_setup( uint32_t tile_num ) {
     osmmap_location->tiley_dest_px_res = 540;
 #endif
     /**
-     * geht app tile
+     * get app tile
      */
     osmmap_app_main_tile = mainbar_get_tile_obj( tile_num );
 

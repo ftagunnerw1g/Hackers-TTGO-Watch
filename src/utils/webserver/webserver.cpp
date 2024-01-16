@@ -37,52 +37,12 @@ void asyncwebserver_end(void){ return; }
 #include <AsyncTCP.h>
 #include <ESPAsyncWebServer.h>
 #include <SPIFFSEditor.h>
-#include <ESP32SSDP.h>
 #include "gui/screenshot.h"
+#include "hardware/pmu.h"
 
 AsyncWebServer asyncserver( WEBSERVERPORT );
 TaskHandle_t _WEBSERVER_Task;
 
-void handleUpdate( AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final) {
-
-  if (!index){
-    /*
-     * if filename includes spiffs, update the spiffs partition
-     */
-    int cmd = (filename.indexOf("spiffs") > 0) ? U_SPIFFS : U_FLASH;
-    if (!Update.begin(UPDATE_SIZE_UNKNOWN, cmd)) {
-      Update.printError(Serial);
-    }
-  }
-
-  /*
-   * Write Data an type message if fail
-   */
-  if (Update.write(data, len) != len) {
-    Update.printError(Serial);
-  }
-
-  /*
-   * After write Update restart
-   */
-  if (final) {
-    AsyncWebServerResponse *response = request->beginResponse(302, "text/plain", "Please wait while the watch reboots");
-    response->addHeader("Refresh", "20");  
-    response->addHeader("Location", "/");
-    request->send(response);
-    if (!Update.end(true)){
-      Update.printError(Serial);
-    } else {
-      Serial.println("Update complete");
-      Serial.flush();
-      ESP.restart();
-    }
-  }
-}
-
-/*
- *
- */
 void asyncwebserver_start(void){
 
   asyncserver.on("/index.htm", HTTP_GET, [](AsyncWebServerRequest *request) {
@@ -107,8 +67,9 @@ void asyncwebserver_start(void){
       "<ul>"
       "<li><a target=\"cont\" href=\"/info\">/info</a> - Device information"
       "<li><a target=\"cont\" href=\"/network\">/network</a> - Network information"
+      "<li><a target=\"cont\" href=\"/power\">/power</a> - Battery information"
       "<li><a target=\"cont\" href=\"/shot\">/shot</a> - Capture screenshot"
-      "<li><a target=\"_blank\" href=\"/edit\">/edit</a> - View, edit, upload or delete files"
+      "<li><a target=\"cont\" href=\"/files\">/files</a> - Config files"
       "</ul>"
       "</body></html>";
     request->send(200, "text/html", html);
@@ -126,10 +87,21 @@ void asyncwebserver_start(void){
     localtime_r(&now, &timeinfo);
     strftime(strftime_buf, sizeof(strftime_buf), "%c", &timeinfo);
 
-    String html = (String) "<html><head><meta charset=\"utf-7\"></head><body><h3>Information</h3>" +
+    String html = (String) "<html><head><meta charset=\"utf-7\"><body><h3>Information</h3>" +
+
+#if defined ( LILYGO_WATCH_2020_V1 )
+                  "<b><u>Hardware</u></b><br>" +
+                  "LilyGo Watch 2020 V1<br><br>" +
+#elif defined( LILYGO_WATCH_2020_V2  )
+                  "<b><u>Hardware</u></b><br>" +
+                  "LilyGo Watch 2020 V2<br><br>" +
+#elif defined( LILYGO_WATCH_2020_V2  )
+                  "<b><u>Hardware</u></b><br>" +
+                  "LilyGo Watch 2020 V3<br><br>" +
+#endif
+
                   "<b><u>Time</u></b><br>" +
                    "<b>UTC: </b>" + strftime_buf + "<br><br>" +  
-
                   "<b><u>Memory</u></b><br>" +
                   "<b>Heap size: </b>" + ESP.getHeapSize() + "<br>" +
                   "<b>Heap free: </b>" + ESP.getFreeHeap() + "<br>" +
@@ -157,7 +129,7 @@ void asyncwebserver_start(void){
   });
 
   asyncserver.on("/network", HTTP_GET, [](AsyncWebServerRequest *request) {
-    String html = (String) "<html><head><meta charset=\"utf-8\"></head><body><h3>Network</h3>" +
+    String html = (String) "<html><head><meta charset=\"utf-8\"><body><h3>Network</h3>" +
                   "<b>IP Addr: </b>" + WiFi.localIP().toString() + "<br>" +
                   "<b>MAC: </b>" + WiFi.macAddress() + "<br>" +
                   "<b>SNMask: </b>" + WiFi.subnetMask().toString() + "<br>" +
@@ -171,12 +143,39 @@ void asyncwebserver_start(void){
     request->send(200, "text/html", html);
   });
 
+  asyncserver.on("/power", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String html = (String) "<html><head><meta charset=\"utf-8\"><body><h3>Power</h3>" +
+                  "<b>Designed capacity: </b>" + pmu_get_designed_battery_cap() + "mAh<br>" +
+                  "<b>Battery voltage: </b>" + pmu_get_battery_voltage() / 1000 + "V<br>" +
+                  "<b>Charge current: </b>" + pmu_get_battery_charge_current() + "mA<br>" +
+                  "<b>Discharge current: </b>" + pmu_get_battery_discharge_current() + "mA<br>" +
+                  "<b>VBUS voltage: </b>" + pmu_get_vbus_voltage() / 1000 + "V<br>" +
+                  "<b>Battery percent: </b>" + pmu_get_battery_percent() + "%<br>" +
+                  "</body></head></html>";
+    request->send(200, "text/html", html);
+  });
+
+  asyncserver.on("/files", HTTP_GET, [](AsyncWebServerRequest *request) {
+    String html = (String) "<html><head><meta charset=\"utf-8\"><body><h3>Config</h3>" +
+                           "<a href=\"/display.json\">/display.json</a> - Display configuration<br>"
+#if defined( LILYGO_WATCH_HAS_GPS ) 
+                           "<a href=\"/gpsctl.json\">/gpsctl.json</a> - GPS configuration<br>"
+#endif
+                           "<a href=\"/motor.json\">/motor.json</a> - Motor configuration<br>"
+#if defined( LILYGO_WATCH_HAS_GPS ) 
+                           "<a href=\"/osmmap.json\">/osmmap.json</a> - OSMMAP configuration<br>"
+#endif
+                           "<a href=\"/timesync.json\">/timesync.json</a> - Time sync configuration<br>"
+                           "<a href=\"/wificfg.json\">/wificfg.json</a> - WiFi configuration<br>"
+                           "</body></head></html>";
+    request->send(200, "text/html", html);
+  });
+
   asyncserver.on("/shot", HTTP_GET, [](AsyncWebServerRequest * request) {
     String html = (String) "<html><head><meta charset=\"utf-8\"><body><h3>Screenshot</h3>" + 
-                           "<b>Screenshot: </b> Captured <br><br>" +
-                           "<a href=screen.png download>Result</a><br>" + 
+			   "<img src=screen.png><br>"
                            "</body></head></html>";
-    log_i("screenshot requested");
+    log_d("screenshot requested");
     screenshot_take();
     screenshot_save();
     request->send(200, "text/html", html);
@@ -187,66 +186,78 @@ void asyncwebserver_start(void){
   asyncserver.serveStatic("/", SPIFFS, "/");
 
   asyncserver.onNotFound([](AsyncWebServerRequest *request){
-    Serial.printf( "NOT_FOUND: ");
+    log_d( "NOT_FOUND: ");
     if(request->method() == HTTP_GET)
-      Serial.printf( "GET");
+      log_d( "GET");
     else if(request->method() == HTTP_POST)
-      Serial.printf( "POST");
+      log_d( "POST");
     else if(request->method() == HTTP_DELETE)
-      Serial.printf( "DELETE");
+      log_d( "DELETE");
     else if(request->method() == HTTP_PUT)
-      Serial.printf( "PUT");
+      log_d( "PUT");
     else if(request->method() == HTTP_PATCH)
-      Serial.printf( "PATCH");
+      log_d( "PATCH");
     else if(request->method() == HTTP_HEAD)
-      Serial.printf( "HEAD");
+      log_d( "HEAD");
     else if(request->method() == HTTP_OPTIONS)
-      Serial.printf( "OPTIONS");
+      log_d( "OPTIONS");
     else
-      Serial.printf( "UNKNOWN");
-    Serial.printf( " http://%s%s\n", request->host().c_str(), request->url().c_str());
+      log_d( "UNKNOWN");
+      log_d( " http://%s%s", request->host().c_str(), request->url().c_str());
 
     if(request->contentLength()){
-      Serial.printf( "_CONTENT_TYPE: %s\n", request->contentType().c_str());
-      Serial.printf( "_CONTENT_LENGTH: %u\n", request->contentLength());
+      log_d( "_CONTENT_TYPE: %s", request->contentType().c_str());
+      log_d( "_CONTENT_LENGTH: %u", request->contentLength());
     }
 
     int headers = request->headers();
     int i;
     for(i=0;i<headers;i++){
       AsyncWebHeader* h = request->getHeader(i);
-      Serial.printf( "_HEADER[%s]: %s\n", h->name().c_str(), h->value().c_str());
+      log_d( "_HEADER[%s]: %s", h->name().c_str(), h->value().c_str());
     }
 
     int params = request->params();
     for(i=0;i<params;i++){
       AsyncWebParameter* p = request->getParam(i);
       if(p->isFile()){
-        Serial.printf( "_FILE[%s]: %s, size: %u\n", p->name().c_str(), p->value().c_str(), p->size());
+        log_d( "_FILE[%s]: %s, size: %u", p->name().c_str(), p->value().c_str(), p->size());
       } else if(p->isPost()){
-        Serial.printf( "_POST[%s]: %s\n", p->name().c_str(), p->value().c_str());
+        log_d( "_POST[%s]: %s", p->name().c_str(), p->value().c_str());
       } else {
-        Serial.printf( "_GET[%s]: %s\n", p->name().c_str(), p->value().c_str());
+        log_d( "_GET[%s]: %s", p->name().c_str(), p->value().c_str());
       }
     }
     request->send(404);
   });
 
   asyncserver.onFileUpload([](AsyncWebServerRequest *request, const String& filename, size_t index, uint8_t *data, size_t len, bool final){
-    if(!index)
-      Serial.printf( "UploadStart: %s\n", filename.c_str());
-    Serial.printf("%s", (const char*)data);
-    if(final)
-      Serial.printf( "UploadEnd: %s (%u)\n", filename.c_str(), index+len);
+  File file;
+  char upload_filename[128];
+  snprintf(upload_filename, 128, "/%s", filename); 
+  if(!index) {
+      log_d( "UploadStart: %s", filename.c_str());
+      file = SPIFFS.open(upload_filename, FILE_WRITE);
+    }
+    if(len) {
+      log_i("writing data to file %s", filename.c_str());
+      log_d("%s", (const char*)data);
+      file.print((const char*)data);
+    }
+    if(final) {
+      log_d( "UploadEnd: %s (%u)", upload_filename, index+len);
+      file.close();
+      request->send(201);
+    }
   });
 
   asyncserver.onRequestBody([](AsyncWebServerRequest *request, uint8_t *data, size_t len, size_t index, size_t total){
     if(!index) {
-      Serial.printf( "BodyStart: %u\n", total);
+      log_d( "BodyStart: %u", total);
     }
-    Serial.printf( "%s", (const char*)data);
+    log_d( "%s", (const char*)data);
     if(index + len == total) {
-      Serial.printf( "BodyEnd: %u\n", total);
+      log_d( "BodyEnd: %u", total);
     }
   });
 
