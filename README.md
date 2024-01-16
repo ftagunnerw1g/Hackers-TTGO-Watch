@@ -86,17 +86,6 @@ sound_play_spiffs_mp3( "/sound.mp3" )
 
 There is a configuration tile to enable/disable all sound output and set the global volume.
 
-# how to make a screenshot
-The firmware has an integrated webserver. Over this a screenshot can be triggered. The image has the format RGB565 and can be read with gimp. From bash it looks like this
-```
-wget x.x.x.x/shot && wget x.x.x.x/screen.data
-```
-I use the following import settings for GIMP:   
-* rgb565
-* offset 1
-* width 240
-* height 240    
-
 # Contributors 
 
 Massive thanks to [sharadac](https://github.com/sharandac/) for the TTGO Watch project.<br> 
